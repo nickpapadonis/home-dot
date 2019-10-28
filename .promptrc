@@ -103,11 +103,11 @@ function shortpath {
 # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
 function setprompt {
   SYS=`hostname | sed 's|\..*||'`
-  OIFS=$IFS
-  IFS='/'
-  set $PWD
-  IFS=$OIFS
-  unset OIFS
+#  OIFS=$IFS
+#  IFS='/'
+#  set $PWD
+#  IFS=$OIFS
+#  unset OIFS
 
   if [ "$PWD" = "$HOME" ]
     then _PWD='~'
@@ -131,9 +131,9 @@ function setprompt {
     _PS2="${Rc}>  ${Nc}"
   ;;
   *)   # User prompt
-    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${_PWD}${Nc}${Bc}]${Nc}$ ${Nc}"
+    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${_PWD}${Nc}${Bc}]${Nc}$ ${Nc}"
     #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
-    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+    _PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
     _PS2="${Bc}>  ${Nc}"
   ;;
   esac
