@@ -33,7 +33,7 @@ case $? in
      Rc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 1\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
      Yc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 3\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
      Bc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 4\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | tput -S && printf \"setab 0\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
      Nc="${BASH:+\\[}${ZSH_VERSION:+%{}`tput sgr0`${ZSH_VERSION:+%\}}${BASH:+\\]}"
   ;;
   *) # setup the ascii methods.
@@ -45,8 +45,8 @@ case $? in
   ;;
 esac
 
-# Truncated path will be this max length
-SPATHLEN=20
+# Title Bar path will be truncated to this max length
+SPATHLEN=40
 
 function shortpath_bash_trunc {
  pwd_length=$SPATHLEN
@@ -116,7 +116,7 @@ function setprompt {
     fi
   fi
   shift $#
-
+ 
   # Read only directories are Red.
   [ -w "${PWD}" ] || _PWD="${Rc}${_PWD}${_Nc}"
 
@@ -128,7 +128,8 @@ function setprompt {
   *)   # User prompt
     #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${_PWD}${Nc}${Bc}]${Nc}$ ${Nc}"
     #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
-    _PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
     _PS2="${Bc}>  ${Nc}"
   ;;
   esac
@@ -136,30 +137,27 @@ function setprompt {
   PS1=`echo ${_PS1}`
   PS2=`echo ${_PS2}`
 
-  # replace spaces with percent sign for pathnames
-  # with spaces
-  SEARCH=' '
-  REPLACE='%20'
-  PWD_URL="${PWD//$SEARCH/$REPLACE}"
-
-  SEARCH=' '
-  REPLACE='_' # XXX fix display of spaces
-  PWD_SPACE="${PWD//$SEARCH/$REPLACE}"
-
-  if [ -n "$KSH_VERSION" ]; then
-    TMP_PWD=$(shortpath $PWD_SPACE)
-  else
-    TMP_PWD=$(shortpath_bash_trunc $PWD_SPACE)
-  fi
-
+  # Titlebar
   if [ -t 0 ]; then	
     if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
+       # replace spaces with percent sign for pathnames
+       # with spaces
+       SEARCH=' '
+       REPLACE='%20'
+       PWD_URL="${PWD//$SEARCH/$REPLACE}"
+
        #titlebar "${SYS} : ${PWD##*/}"
        $ECHOE "\033]0;$SYS\007"
        $ECHOE "\033]6;\007"
        $ECHOE "\033]7;file:$PWD_URL\007"
     elif [[ "$TERM" == *"xterm"* ]]; then
-       $ECHOE "\033]0;$SYS:$TMP_PWD\007"
+       if [ -n "$KSH_VERSION" ]; then
+       	  TMP_PWD=$(shortpath "$PWD")
+       else
+          TMP_PWD=$(shortpath_bash_trunc "$PWD")
+       fi
+       $ECHOE "\033]0;$SYS\007"
+       printf "\033]1;%s\007" "$TMP_PWD"
        $ECHOE "\033]6;\007"
        $ECHOE "\033]7;\007"
     fi
