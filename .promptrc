@@ -1,0 +1,247 @@
+#tput is part of ncurses
+
+# Get terminfo entry for type screen
+# infocmp $TERM
+
+#0 – Black
+#1 – Red
+#2 – Green
+#3 – Yellow
+#4 – Blue
+#5 – Magenta
+#6 – Cyan
+#7 – White
+
+#tput bold – Set bold mode
+#tput dim – turn on half-bright mode
+#tput smul – begin underline mode
+#tput rmul – exit underline mode
+#tput rev – Turn on reverse mode
+#tput smso – Enter standout mode (bold on rxvt)
+#tput rmso – Exit standout mode
+#tput sgr0 – Turn off all attributes
+
+#tput setab [1-7] – Set a background color using ANSI escape
+#tput setb [1-7] – Set a background color
+#tput setaf [1-7] – Set a foreground color using ANSI escape
+#tput setf [1-7] – Set a foreground color
+
+tput setaf 4 2>/dev/null
+case $? in
+  0) # tput works.
+     tput sgr0 
+     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 1\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 3\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 4\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}`tput sgr0`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+  ;;
+  *) # setup the ascii methods.
+     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;33m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;34m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+  ;;
+esac
+
+# Truncated path will be this max length
+SPATHLEN=20
+
+function shortpath_bash_trunc {
+ pwd_length=$SPATHLEN
+ pwd_symbol="..."
+ newPWD="${1/#$HOME/~}"
+ if [ $(echo -n $newPWD | wc -c | tr -d " ") -gt $pwd_length ]; then
+   newPWD=$(echo -n $newPWD | awk -F '/' '{
+   print $1 "/" $2 "/.../" $(NF-1) "/" $(NF)}')
+ fi
+ echo ${newPWD}
+}
+
+function shortpath_bash {
+  typeset tpwd=$1
+  typeset more=
+
+  if [[ $tpwd = $HOME?\(/*\) ]]
+  then
+    tpwd=\~${tpwd#$HOME}
+  fi
+  if [ $(echo -n $tpwd | wc -c | tr -d " ") -gt $SPATHLEN ]
+  then
+    newPWD="$(echo -n $tpwd | sed -e "s/.*\(.\{$SPATHLEN\}\)/\1/")"
+    more=+
+  else
+    newPWD="$(echo -n $tpwd)"
+  fi
+
+  echo "$more$newPWD"
+}
+
+function shortpath {
+    typeset tpwd=$1
+    typeset more=
+
+    # Replace leading $HOME with ~
+    if [[ $tpwd = "$HOME?(/*)" ]]
+    then
+        tpwd=\~${tpwd#$HOME}
+    fi
+    # Truncate if longer than SPATHLEN chars length
+    if (( ${#tpwd} > $SPATHLEN ))
+    then
+	len=`echo $tpwd | wc -m`
+	start=$(expr $len - $SPATHLEN)
+	tpwd=`echo $tpwd | cut -c$start-$len`
+        more="+"
+    fi
+    printf "$more$tpwd\n"
+}
+
+
+# This function updates the interactive prompt.
+# Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
+function setprompt {
+  SYS=`hostname | sed 's|\..*||'`
+  OIFS=$IFS
+  IFS='/'
+  set $PWD
+  IFS=$OIFS
+  unset OIFS
+
+  if [ "$PWD" = "$HOME" ]
+    then _PWD='~'
+  elif [ "$#" -le "2"  ]
+    then _PWD="${PWD}"
+    else 
+      if [ -n "$KSH_VERSION" ]
+          then _PWD="${@:$#}"  # only in newish ksh or bash.
+      else
+          _PWD=$(basename "${PWD}")
+    fi
+  fi
+  shift $#
+
+  # Read only directories are Red.
+  [ -w "${PWD}" ] || _PWD="${Rc}${_PWD}${_Nc}"
+
+  case `id | cut -d'(' -f1 | cut -c5-` in
+  0)   # Root prompt
+    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}${_PWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
+    _PS2="${Rc}>  ${Nc}"
+  ;;
+  *)   # User prompt
+    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${_PWD}${Nc}${Bc}]${Nc}$ ${Nc}"
+    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+    _PS2="${Bc}>  ${Nc}"
+  ;;
+  esac
+  COLUMNS=`expr ${#_PS1} + 10`
+  PS1=`echo ${_PS1}`
+  PS2=`echo ${_PS2}`
+
+  # replace spaces with percent sign for pathnames
+  # with spaces
+  SEARCH=' '
+  REPLACE='%20'
+  PWD_URL="${PWD//$SEARCH/$REPLACE}"
+
+  SEARCH=' '
+  REPLACE='_' # XXX fix display of spaces
+  PWD_SPACE="${PWD//$SEARCH/$REPLACE}"
+
+  if [ -n "$KSH_VERSION" ]; then
+    TMP_PWD=$(shortpath $PWD_SPACE)
+  else
+    TMP_PWD=$(shortpath_bash_trunc $PWD_SPACE)
+  fi
+
+  if [ -t 0 ]; then	
+    if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
+       #titlebar "${SYS} : ${PWD##*/}"
+       $ECHOE "\033]0;$SYS\007"
+       $ECHOE "\033]6;\007"
+       $ECHOE "\033]7;file:$PWD_URL\007"
+    elif [[ "$TERM" == *"xterm"* ]]; then
+       $ECHOE "\033]0;$SYS:$TMP_PWD\007"
+       $ECHOE "\033]6;\007"
+       $ECHOE "\033]7;\007"
+    fi
+  fi
+
+  unset SYS _PWD
+}
+
+prompt_cd() {
+  ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
+  # command 'cd' "$@" && setprompt
+
+  ## ksh88 support - "\cd" is an alternative to avoid functions.
+  ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
+  \cd "${@:-"$HOME"}" && setprompt
+}
+
+if [[ $VISUAL != "" ]]; then
+  case `basename $VISUAL` in
+    *[Vv][Ii]*)
+      set -o vi
+    ;;
+    *macs*)
+      set -o emacs
+      # following for emacs keybind (bash/emacs style arrows).
+      alias __A=`echo "\020"` # up
+      alias __B=`echo "\016"` # down
+      alias __C=`echo "\006"` # right
+      alias __D=`echo "\002"` # left
+    ;;
+    *) # Some other editor?
+       # ksh does not support other editors.
+       #set -o vi
+    ;;
+  esac
+fi
+
+ECHOE='echo -ne'
+[ "`uname -s`" == "SunOS" ] && \
+[ "`uname -r`" == "5.11" ] && \
+[ -x "/usr/gnu/bin/echo" ] && \
+ECHOE='/usr/gnu/bin/echo -ne'
+
+# the prompt features the working path, and colors.
+HOSTNAME=`hostname`
+#setprompt
+
+if [[ "$SHELL" == *"bash"* ]] ; then
+   PROMPT_COMMAND=setprompt
+else
+   alias cd="prompt_cd"
+   alias ..='prompt_cd ".." ; printf "$PWD\n"'
+fi
+
+# List enhancements
+# Solaris 5.11 may have GNU ls(1) installed.
+[ "`uname -s`" = "SunOS" ] && \
+[ "`uname -r`" = "5.11" ] && \
+[ -x "/usr/gnu/bin/ls" ] && \
+export PATH="/usr/gnu/bin/:$PATH" && \
+alias ls='/usr/gnu/bin/ls'
+
+# check for GNU ls (colorful list)
+#[ "$COLOR_LS" != "0" ] && \
+#ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
+
+# check for human readable ( -h )
+ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
+
+alias l.='ls -lAdF ${H} ${LS_COLOUR} .*'    # list only hidden things
+alias la='ls -lAF ${H} ${LS_COLOUR}'        # list all
+alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
+alias ls='ls -F ${LS_COLOUR}'               # list with flags
+
+# print the name of the invoked command to the title bar
+# Apple_Terminal already has scripts to do this in /etc
+if [[ "$TERM" == *"xterm"* ]]; then
+   trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
+fi
+   

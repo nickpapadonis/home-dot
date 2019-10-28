@@ -1,0 +1,5 @@
+#!/bin/bash
+
+alias symb='cd ~/src/symbol-paper/french/doc'
+
+export INFOPATH="~/info:/usr/share/info"

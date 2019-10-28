@@ -1,0 +1,16 @@
+rmd () {
+  pandoc $1 | lynx -stdin
+}
+export idrive=~/Library/Mobile\ Documents/com~apple~CloudDocs
+alias ic="cd \"$idrive\""
+export PATH=$PATH:~/bin:~/go/bin
+
+# CTRL-S is reserved for XON/XOFF flow control
+# remove so CTRL-S can be used
+#stty -ixon -ixoff
+stty -ixon
+
+# CTRL-O discarded by terminal, fix
+# stty discard undef
+
+bind -x '"\C-l": clear'
