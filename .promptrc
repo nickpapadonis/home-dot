@@ -49,30 +49,28 @@ esac
 SPATHLEN=40
 
 function shortpath_bash_trunc {
- pwd_length=$SPATHLEN
- pwd_symbol="..."
- newPWD="${1/#$HOME/~}"
- if [ $(echo -n $newPWD | wc -c | tr -d " ") -gt $pwd_length ]; then
-   newPWD=$(echo -n $newPWD | awk -F '/' '{
-   print $1 "/" $2 "/.../" $(NF-1) "/" $(NF)}')
- fi
- echo ${newPWD}
+    pwd_length=$SPATHLEN
+    pwd_symbol="..."
+    newPWD="${1/#$HOME/~}"
+    if [ $(echo -n $newPWD | wc -c | tr -d " ") -gt $pwd_length ]; then
+	newPWD=$(echo -n $newPWD | awk -F '/' '{
+        print $1 "/" $2 "/.../" $(NF-1) "/" $(NF)}')
+    fi
+    echo ${newPWD}
 }
 
 function shortpath_bash {
   typeset tpwd=$1
   typeset more=
 
-  if [[ $tpwd = $HOME?\(/*\) ]]
-  then
-    tpwd=\~${tpwd#$HOME}
+  if [[ $tpwd = $HOME?\(/*\) ]]; then
+      tpwd=\~${tpwd#$HOME}
   fi
-  if [ $(echo -n $tpwd | wc -c | tr -d " ") -gt $SPATHLEN ]
-  then
-    newPWD="$(echo -n $tpwd | sed -e "s/.*\(.\{$SPATHLEN\}\)/\1/")"
-    more=+
+  if [ $(echo -n $tpwd | wc -c | tr -d " ") -gt $SPATHLEN ]; then
+      newPWD="$(echo -n $tpwd | sed -e "s/.*\(.\{$SPATHLEN\}\)/\1/")"
+      more=+
   else
-    newPWD="$(echo -n $tpwd)"
+      newPWD="$(echo -n $tpwd)"
   fi
 
   echo "$more$newPWD"
@@ -83,13 +81,11 @@ function shortpath {
     typeset more=
 
     # Replace leading $HOME with ~
-    if [[ $tpwd = "$HOME?(/*)" ]]
-    then
+    if [[ $tpwd = "$HOME?(/*)" ]]; then
         tpwd=\~${tpwd#$HOME}
     fi
     # Truncate if longer than SPATHLEN chars length
-    if (( ${#tpwd} > $SPATHLEN ))
-    then
+    if (( ${#tpwd} > $SPATHLEN )); then
 	len=`echo $tpwd | wc -m`
 	start=$(expr $len - $SPATHLEN)
 	tpwd=`echo $tpwd | cut -c$start-$len`
@@ -102,127 +98,127 @@ function shortpath {
 # This function updates the interactive prompt.
 # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
 function setprompt {
-  SYS=`hostname | sed 's|\..*||'`
+    SYS=`hostname | sed 's|\..*||'`
+    
+    _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
+    # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
 
-  if [ "$PWD" = "$HOME" ]
-    then _PWD='~'
-  elif [ "$#" -le "2"  ]
-    then _PWD="${PWD}"
-    else 
-      if [ -n "$KSH_VERSION" ]
-          then _PWD="${@:$#}"  # only in newish ksh or bash.
-      else
-          _PWD=$(basename "${PWD}")
+    # Read only directories are Red.
+    [ -w "${_PWD}" ] || CPWD="${Rc}${_PWD}${_Nc}"
+
+    case `id | cut -d'(' -f1 | cut -c5-` in
+	0)   # Root prompt
+	    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
+	    _PS2="${Rc}>  ${Nc}"
+	    ;;
+	*)   # User prompt
+	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${CPWD}${Nc}${Bc}]${Nc}$ ${Nc}"
+	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+	    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+	    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+	    _PS2="${Bc}>  ${Nc}"
+	    ;;
+    esac
+
+    #COLUMNS=`expr ${#_PS1} + 10`
+    PS1=`echo ${_PS1}`
+    PS2=`echo ${_PS2}`
+
+    # Titlebar
+    if [ -t 0 ]; then	
+	if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
+	    # replace spaces with percent sign for pathnames
+	    # with spaces
+	    SEARCH=' '
+	    REPLACE='%20'
+	    PWD_URL="${PWD//$SEARCH/$REPLACE}"
+
+	    #titlebar "${SYS} : ${PWD##*/}"
+	    $ECHOE "\033]0;$SYS\007"
+	    $ECHOE "\033]6;\007"
+	    $ECHOE "\033]7;file:$PWD_URL\007"
+	elif [[ "$TERM" == *"xterm"* ]]; then
+	    if [ -n "$KSH_VERSION" ]; then
+       		TMP_PWD=$(shortpath "$_PWD")
+	    else
+		TMP_PWD=$(shortpath_bash_trunc "$_PWD")
+		
+		# clear out previous title bar
+		$ECHOE "\033]0;\007"
+		printf "\033]1;\007"
+		printf "\033]2;\007"
+		$ECHOE "\033]6;\007"
+		$ECHOE "\033]7;\007"
+
+		#$ECHOE "\033]0;$SYS\007"
+		#printf "\033]1;%s\007" "$SYS"
+		printf "\033]2;%s\007" "$SYS:$TMP_PWD"
+		#$ECHOE "\033]6;\007"
+		#$ECHOE "\033]7;file:$PWD_URL\007"
+	    fi
+	fi
     fi
-  fi
-  shift $#
- 
-  # Read only directories are Red.
-  [ -w "${PWD}" ] || _PWD="${Rc}${_PWD}${_Nc}"
-
-  case `id | cut -d'(' -f1 | cut -c5-` in
-  0)   # Root prompt
-    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}${_PWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
-    _PS2="${Rc}>  ${Nc}"
-  ;;
-  *)   # User prompt
-    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${_PWD}${Nc}${Bc}]${Nc}$ ${Nc}"
-    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
-    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${_PWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-    _PS2="${Bc}>  ${Nc}"
-  ;;
-  esac
-  COLUMNS=`expr ${#_PS1} + 10`
-  PS1=`echo ${_PS1}`
-  PS2=`echo ${_PS2}`
-
-  # Titlebar
-  if [ -t 0 ]; then	
-    if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
-       # replace spaces with percent sign for pathnames
-       # with spaces
-       SEARCH=' '
-       REPLACE='%20'
-       PWD_URL="${PWD//$SEARCH/$REPLACE}"
-
-       #titlebar "${SYS} : ${PWD##*/}"
-       $ECHOE "\033]0;$SYS\007"
-       $ECHOE "\033]6;\007"
-       $ECHOE "\033]7;file:$PWD_URL\007"
-    elif [[ "$TERM" == *"xterm"* ]]; then
-       if [ -n "$KSH_VERSION" ]; then
-       	  TMP_PWD=$(shortpath "$PWD")
-       else
-          TMP_PWD=$(shortpath_bash_trunc "$PWD")
-       fi
-       $ECHOE "\033]0;$SYS\007"
-       printf "\033]1;%s\007" "$TMP_PWD"
-       $ECHOE "\033]6;\007"
-       $ECHOE "\033]7;\007"
-    fi
-  fi
-
-  unset SYS _PWD
+    unset SYS _PWD
 }
 
 prompt_cd() {
-  ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
-  # command 'cd' "$@" && setprompt
+    ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
+    # command 'cd' "$@" && setprompt
 
-  ## ksh88 support - "\cd" is an alternative to avoid functions.
-  ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-  \cd "${@:-"$HOME"}" && setprompt
+    ## ksh88 support - "\cd" is an alternative to avoid functions.
+    ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
+    \cd "${@:-"$HOME"}" && setprompt
 }
 
 if [[ $VISUAL != "" ]]; then
-  case `basename $VISUAL` in
-    *[Vv][Ii]*)
-      set -o vi
-    ;;
-    *macs*)
-      set -o emacs
-      # following for emacs keybind (bash/emacs style arrows).
-      alias __A=`echo "\020"` # up
-      alias __B=`echo "\016"` # down
-      alias __C=`echo "\006"` # right
-      alias __D=`echo "\002"` # left
-    ;;
-    *) # Some other editor?
-       # ksh does not support other editors.
-       #set -o vi
-    ;;
-  esac
+    case `basename $VISUAL` in
+	*[Vv][Ii]*)
+	    set -o vi
+	    ;;
+	*macs*)
+	    set -o emacs
+	    # following for emacs keybind (bash/emacs style arrows).
+	    alias __A=`echo "\020"` # up
+	    alias __B=`echo "\016"` # down
+	    alias __C=`echo "\006"` # right
+	    alias __D=`echo "\002"` # left
+	    ;;
+	*) # Some other editor?
+	    # ksh does not support other editors.
+	    #set -o vi
+	    ;;
+    esac
 fi
 
 ECHOE='echo -ne'
 [ "`uname -s`" == "SunOS" ] && \
-[ "`uname -r`" == "5.11" ] && \
-[ -x "/usr/gnu/bin/echo" ] && \
-ECHOE='/usr/gnu/bin/echo -ne'
+    [ "`uname -r`" == "5.11" ] && \
+    [ -x "/usr/gnu/bin/echo" ] && \
+    ECHOE='/usr/gnu/bin/echo -ne'
 
 # the prompt features the working path, and colors.
 HOSTNAME=`hostname`
+
 setprompt
 
 if [[ "$SHELL" == *"bash"* ]] ; then
-   PROMPT_COMMAND=setprompt
+    PROMPT_COMMAND=setprompt
 else
-   alias cd="prompt_cd"
-   alias ..='prompt_cd ".." ; printf "$PWD\n"'
+    alias cd="prompt_cd"
+    alias ..='prompt_cd ".." ; printf "$PWD\n"'
 fi
 
 # List enhancements
 # Solaris 5.11 may have GNU ls(1) installed.
 [ "`uname -s`" = "SunOS" ] && \
-[ "`uname -r`" = "5.11" ] && \
-[ -x "/usr/gnu/bin/ls" ] && \
-export PATH="/usr/gnu/bin/:$PATH" && \
-alias ls='/usr/gnu/bin/ls'
+    [ "`uname -r`" = "5.11" ] && \
+    [ -x "/usr/gnu/bin/ls" ] && \
+    export PATH="/usr/gnu/bin/:$PATH" && \
+    alias ls='/usr/gnu/bin/ls'
 
 # check for GNU ls (colorful list)
 #[ "$COLOR_LS" != "0" ] && \
-#ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
+    #ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
 
 # check for human readable ( -h )
 ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
@@ -235,6 +231,6 @@ alias ls='ls -F ${LS_COLOUR}'               # list with flags
 # print the name of the invoked command to the title bar
 # Apple_Terminal already has scripts to do this in /etc
 if [[ "$TERM" == *"xterm"* ]]; then
-   trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
+    trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
 fi
    
