@@ -99,12 +99,17 @@ function shortpath {
 # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
 function setprompt {
     SYS=`hostname | sed 's|\..*||'`
-    
+
     _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
-    # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
+  # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
 
     # Read only directories are Red.
-    [ -w "${_PWD}" ] || CPWD="${Rc}${_PWD}${_Nc}"
+    if [ ! -w "${PWD}" ] ; then
+	CPWD="${Rc}${_PWD}${Nc}"
+    else
+	CPWD=$_PWD
+    fi
+
 
     case `id | cut -d'(' -f1 | cut -c5-` in
 	0)   # Root prompt
@@ -131,7 +136,7 @@ function setprompt {
 	    # with spaces
 	    SEARCH=' '
 	    REPLACE='%20'
-	    PWD_URL="${PWD//$SEARCH/$REPLACE}"
+	    PWD_URL="${_PWD//$SEARCH/$REPLACE}"
 
 	    #titlebar "${SYS} : ${PWD##*/}"
 	    $ECHOE "\033]0;$SYS\007"
@@ -233,4 +238,3 @@ alias ls='ls -F ${LS_COLOUR}'               # list with flags
 if [[ "$TERM" == *"xterm"* ]]; then
     trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
 fi
-   
