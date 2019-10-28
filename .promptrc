@@ -136,7 +136,7 @@ function setprompt {
 	    # with spaces
 	    SEARCH=' '
 	    REPLACE='%20'
-	    PWD_URL="${_PWD//$SEARCH/$REPLACE}"
+	    PWD_URL="${PWD//$SEARCH/$REPLACE}"
 
 	    #titlebar "${SYS} : ${PWD##*/}"
 	    $ECHOE "\033]0;$SYS\007"
