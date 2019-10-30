@@ -3,7 +3,7 @@
 #
 # Use less(1) or more(1) as the default pager for the man(1) command.
 #
-export PATH=/usr/bin:/usr/sbin:/bin:/sbin
+
 
 if [ -f /usr/bin/less ]; then
     export PAGER="/usr/bin/less -ins"
@@ -11,9 +11,10 @@ elif [ -f /usr/bin/more ]; then
     export PAGER="/usr/bin/more -s"
 fi
 
-#export EDITOR="vim"
 export EDITOR="emacs"
 
+# Enable color lS
+COLOR_LS=0
 #
 # Define default prompt to <username>@<hostname>:<path><"($|#) ">
 # and print '#' for user "root" and '$' for normal users.
@@ -22,11 +23,11 @@ export EDITOR="emacs"
 #
 
 if [[ `uname` == "Linux" ]]; then
-    IS_LINUX=1
+    export IS_LINUX=1
 elif [[ `uname` == "SunOS" ]]; then
-    IS_SOE=1
+    export IS_SOE=1
 elif [[ `uname` == "Darwin" ]]; then
-    IS_MACOS=1
+    export IS_MACOS=1
 fi
 
 # source env variables for platform
@@ -34,7 +35,7 @@ if [[ "$IS_LINUX" == "1" ]]; then
     if [ -f ~/.profile_lnx ]; then
 	. ~/.profile_lnx
     fi
-elif [[ "$IS_SOE" == "1" ]]; then
+elif [[ "$IS_SOL" == "1" ]]; then
     if [ -f ~/.profile_sol ]; then
 	. ~/.profile_sol
     fi

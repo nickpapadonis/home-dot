@@ -48,7 +48,8 @@ esac
 # Title Bar path will be truncated to this max length
 SPATHLEN=40
 
-function shortpath_bash_trunc {
+# works with ksh93 and bash
+function shortpath_new_trunc {
     pwd_length=$SPATHLEN
     pwd_symbol="..."
     newPWD="${1/#$HOME/~}"
@@ -76,6 +77,7 @@ function shortpath_bash {
   echo "$more$newPWD"
 }
 
+# for ksh88
 function shortpath {
     typeset tpwd=$1
     typeset more=
@@ -94,42 +96,14 @@ function shortpath {
     printf "$more$tpwd\n"
 }
 
+# the prompt features the working path, and colors.
+export HOSTNAME=`hostname`
 
-# This function updates the interactive prompt.
-# Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
-function setprompt {
-    SYS=`hostname | sed 's|\..*||'`
-
+function settitle {
+    SYS=`echo $HOSTNAME | sed 's|\..*||'`
     _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
   # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
 
-    # Read only directories are Red.
-    if [ ! -w "${PWD}" ] ; then
-	CPWD="${Rc}${_PWD}${Nc}"
-    else
-	CPWD=$_PWD
-    fi
-
-
-    case `id | cut -d'(' -f1 | cut -c5-` in
-	0)   # Root prompt
-	    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
-	    _PS2="${Rc}>  ${Nc}"
-	    ;;
-	*)   # User prompt
-	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${CPWD}${Nc}${Bc}]${Nc}$ ${Nc}"
-	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
-	    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-	    _PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-	    _PS2="${Bc}>  ${Nc}"
-	    ;;
-    esac
-
-    #COLUMNS=`expr ${#_PS1} + 10`
-    PS1=`echo ${_PS1}`
-    PS2=`echo ${_PS2}`
-
-    # Titlebar
     if [ -t 0 ]; then	
 	if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
 	    # replace spaces with percent sign for pathnames
@@ -144,34 +118,68 @@ function setprompt {
 	    $ECHOE "\033]7;file:$PWD_URL\007"
 	elif [[ "$TERM" == *"xterm"* ]]; then
 	    if [ -n "$KSH_VERSION" ]; then
-       		TMP_PWD=$(shortpath "$_PWD")
+       		TMP_PWD=$(shortpath_new_trunc "$_PWD")
 	    else
-		TMP_PWD=$(shortpath_bash_trunc "$_PWD")
+		TMP_PWD=$(shortpath_new_trunc "$_PWD")
 	    fi
-		# clear out previous title bar
-		$ECHOE "\033]0;\007"
-		printf "\033]1;\007"
-		printf "\033]2;\007"
-		$ECHOE "\033]6;\007"
-		$ECHOE "\033]7;\007"
-
-		#$ECHOE "\033]0;$SYS\007"
-		#printf "\033]1;%s\007" "$SYS"
-		printf "\033]2;%s\007" "$SYS:$TMP_PWD"
-		#$ECHOE "\033]6;\007"
-		#$ECHOE "\033]7;file:$PWD_URL\007"
+	    # clear out previous title bar
+	    $ECHOE "\033]0;\007"
+	    printf "\033]1;\007"
+	    printf "\033]2;\007"
+	    $ECHOE "\033]6;\007"
+	    $ECHOE "\033]7;\007"
+	    
+	    #$ECHOE "\033]0;$SYS\007"
+	    #printf "\033]1;%s\007" "$SYS"
+	    printf "\033]2;%s\007" "$SYS:$TMP_PWD"
+	    #$ECHOE "\033]6;\007"
+	    #$ECHOE "\033]7;file:$PWD_URL\007"
 	fi
     fi
+}
+
+function setprompt {
+    SYS=`echo $HOSTNAME | sed 's|\..*||'`
+
+    _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
+  # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
+
+    # Read only directories are Red.
+    if [ ! -w "${PWD}" ] ; then
+	CPWD="${Rc}${_PWD}${Nc}"
+    else
+	CPWD=$_PWD
+    fi
+
+    # This function updates the interactive prompt.
+    # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
+    UID=`id | cut -d'(' -f1 | cut -c5-`
+
+    case $UID in
+	0)   # Root prompt
+	    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
+	    _PS2="${Rc}>  ${Nc}"
+	    ;;
+	*)   # User prompt
+	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${CPWD}${Nc}${Bc}]${Nc}$ ${Nc}"
+	    #_PS1="${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}$ ${Nc}"
+	    #_PS1="${Bc}[${Nc}${LOGNAME}${Bc}@${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+	    _PS1="\! ${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+	    _PS2="${Bc}>  ${Nc}"
+	    ;;
+    esac
+
+    #COLUMNS=`expr ${#_PS1} + 10`
+    PS1=`echo ${_PS1}`
+    PS2=`echo ${_PS2}`
+    
     unset SYS _PWD
 }
 
 prompt_cd() {
-    ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
-    #command 'cd' "$@" && setprompt
-
     ## ksh88 support - "\cd" is an alternative to avoid functions.
     ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-    \cd "${@:-"$HOME"}" && setprompt
+    \cd "${@:-"$HOME"}" && setprompt && settitle
 }
 
 if [[ $VISUAL != "" ]]; then
@@ -187,9 +195,7 @@ if [[ $VISUAL != "" ]]; then
 	    alias __C=`echo "\006"` # right
 	    alias __D=`echo "\002"` # left
 	    ;;
-	*) # Some other editor?
-	    # ksh does not support other editors.
-	    #set -o vi
+	*)
 	    ;;
     esac
 fi
@@ -200,13 +206,9 @@ ECHOE='echo -ne'
     [ -x "/usr/gnu/bin/echo" ] && \
     ECHOE='/usr/gnu/bin/echo -ne'
 
-# the prompt features the working path, and colors.
-HOSTNAME=`hostname`
-
-setprompt
 
 # For some reason OSX reports ksh as SHELL=bash
-if [[ "$DOT_KSHRC" == "TRUE" ]] ; then
+if [[ $SHELL = *"ksh"* ]] ; then
     alias cd="prompt_cd"
     alias ..='prompt_cd ".." ; printf "$PWD\n"'
 elif [[ "$SHELL" == *"bash"* ]] ; then
@@ -222,8 +224,8 @@ fi
     alias ls='/usr/gnu/bin/ls'
 
 # check for GNU ls (colorful list)
-#[ "$COLOR_LS" != "0" ] && \
-    #ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
+[ "$COLOR_LS" != "0" ] && \
+    ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
 
 # check for human readable ( -h )
 ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
@@ -238,4 +240,5 @@ alias ls='ls -F ${LS_COLOUR}'               # list with flags
 if [[ "$TERM" == *"xterm"* ]]; then
     trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
 fi
- 
+
+setprompt && settitle

@@ -11,6 +11,6 @@ export PATH=$PATH:~/bin:~/go/bin
 stty -ixon
 
 # CTRL-O discarded by terminal, fix
-# stty discard undef
+stty discard undef
 
-bind -x '"\C-l": clear'
+#bind -x '"\C-l": clear'
