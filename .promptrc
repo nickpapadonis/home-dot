@@ -160,8 +160,6 @@ function setprompt {
 		printf "\033]2;%s\007" "$SYS:$TMP_PWD"
 		#$ECHOE "\033]6;\007"
 		#$ECHOE "\033]7;file:$PWD_URL\007"
-
-
 	fi
     fi
     unset SYS _PWD
@@ -169,7 +167,7 @@ function setprompt {
 
 prompt_cd() {
     ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
-    # command 'cd' "$@" && setprompt
+    #command 'cd' "$@" && setprompt
 
     ## ksh88 support - "\cd" is an alternative to avoid functions.
     ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
@@ -207,11 +205,12 @@ HOSTNAME=`hostname`
 
 setprompt
 
-if [[ "$SHELL" == *"bash"* ]] ; then
-    PROMPT_COMMAND=setprompt
-else
+# For some reason OSX reports ksh as SHELL=bash
+if [[ "$DOT_KSHRC" == "TRUE" ]] ; then
     alias cd="prompt_cd"
     alias ..='prompt_cd ".." ; printf "$PWD\n"'
+elif [[ "$SHELL" == *"bash"* ]] ; then
+    PROMPT_COMMAND=setprompt
 fi
 
 # List enhancements
@@ -239,3 +238,4 @@ alias ls='ls -F ${LS_COLOUR}'               # list with flags
 if [[ "$TERM" == *"xterm"* ]]; then
     trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
 fi
+ 
