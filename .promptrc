@@ -210,10 +210,10 @@ ECHOE='echo -ne'
 
 
 # For some reason OSX reports ksh as SHELL=bash
-if [[ $SHELL = *"ksh"* ]] ; then
+if [[ "$0" = *"ksh"* ]] ; then
     alias cd="prompt_cd"
     alias ..='prompt_cd ".." ; printf "$PWD\n"'
-elif [[ "$SHELL" == *"bash"* ]] ; then
+elif [[ "$0" == *"bash"* ]] ; then
     PROMPT_COMMAND=setprompt
 fi
 
