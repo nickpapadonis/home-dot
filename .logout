@@ -1,0 +1,13 @@
+# Clear title bar
+if [ "$TERM_PROGRAM" == "Apple_Terminal" ]; then
+    echo -e "\033];\007"
+elif [ "$TERM_PROGRAM" == *"xterm"* ]; then
+    echo -e "\033];\007"
+fi
+
+# Clear console if top level shell
+if [ $IS_LINUX == 1 ] || [ $IS_SOL ]; then
+    if [ "$SHLVL" = 1 ]; then
+        [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+    fi
+fi

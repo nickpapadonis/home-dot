@@ -153,7 +153,9 @@ function setprompt {
 
     # This function updates the interactive prompt.
     # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
-    UID=`id | cut -d'(' -f1 | cut -c5-`
+    if [ -z $UID ] ; then
+        UID=`id | cut -d'(' -f1 | cut -c5-`
+    fi
 
     case $UID in
 	0)   # Root prompt
