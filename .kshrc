@@ -1,5 +1,4 @@
 # $HOME/.kshrc
-
 COLOR_LS=0
 SPATHLEN=23
 
@@ -36,9 +35,10 @@ if [[ $EDITOR != "" ]]; then
   [ "`basename $EDITOR`" = "vim" ] && alias vi='vim'
 fi
 
+DOT_KSHRC=TRUE
+
 if [ -f ~/.promptrc ]; then
     . ~/.promptrc
 fi
 
-DOT_KSHRC=TRUE
 export DOT_KSHRC
