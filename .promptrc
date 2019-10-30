@@ -147,7 +147,7 @@ function setprompt {
        		TMP_PWD=$(shortpath "$_PWD")
 	    else
 		TMP_PWD=$(shortpath_bash_trunc "$_PWD")
-		
+	    fi
 		# clear out previous title bar
 		$ECHOE "\033]0;\007"
 		printf "\033]1;\007"
@@ -160,7 +160,8 @@ function setprompt {
 		printf "\033]2;%s\007" "$SYS:$TMP_PWD"
 		#$ECHOE "\033]6;\007"
 		#$ECHOE "\033]7;file:$PWD_URL\007"
-	    fi
+
+
 	fi
     fi
     unset SYS _PWD
