@@ -15,4 +15,6 @@ export WXDIFFCMD="diff -bwU5"
 export PATH=$PATH:/usr/local/bin
 
 # Make sure all history lines are written on exit
-shopt -s histappend
+if [ "$SHELL" == "bash" ]; then
+    shopt -s histappend
+fi
