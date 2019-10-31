@@ -1,0 +1,136 @@
+# create a history directory if it doesn't exit
+if [[ ! -d $HOME/.hist ]]; then
+    mkdir -p $HOME/.hist
+fi
+
+# deletes process history if the process is not active, these
+# are assume exited bash sessions.  note this is only valid
+# for single system.
+function purge_hist {
+    for i in $(comm -23 <(sort -n <(ls $HOME/.hist/history.* | sed "s#$HOME/.hist/history.##"))  <(sort <(for i in $(ps -ex -o pid | sed 1d); do echo $i ; done))); do echo "$HOME/.hist/history.$i"; done | xargs rm
+}
+
+# Title Bar path will be truncated to this max length
+SPATHLEN=40
+
+# uses long/.../path
+function shortpath_new_trunc {
+    pwd_length=$SPATHLEN
+    pwd_symbol="..."
+    newPWD="${1/#$HOME/~}"
+    if [ $(echo -n $newPWD | wc -c | tr -d " ") -gt $pwd_length ]; then
+	newPWD=$(echo -n $newPWD | awk -F '/' '{
+        print $1 "/" $2 "/.../" $(NF-1) "/" $(NF)}')
+    fi
+    echo ${newPWD}
+}
+
+# uses +long/path
+function shortpath_bash {
+    typeset tpwd=$1
+    typeset more=
+    if [[ $tpwd = $HOME?\(/*\) ]]; then
+	tpwd=\~${tpwd#$HOME}
+    fi
+    if [[ $(echo -n $tpwd | wc -c | tr -d " ") -gt $SPATHLEN ]]; then
+	newPWD="$(echo -n $tpwd | sed -e "s/.*\(.\{$SPATHLEN\}\)/\1/")"
+	more=+
+    else
+	newPWD="$(echo -n $tpwd)"
+    fi
+    echo "$more$newPWD"
+}
+
+# for ksh88
+# uses +long/path
+function shortpath {
+    typeset tpwd=$1
+    typeset more=
+    # Replace leading $HOME with ~
+    if [[ $tpwd = "$HOME?(/*)" ]]; then
+        tpwd=\~${tpwd#$HOME}
+    fi
+    # Truncate if longer than SPATHLEN chars length
+    if (( ${#tpwd} > $SPATHLEN )); then
+	len=`echo $tpwd | wc -m`
+	start=$(expr $len - $SPATHLEN)
+	tpwd=`echo $tpwd | cut -c$start-$len`
+        more="+"
+    fi
+    printf "$more$tpwd\n"
+}
+
+# Construct a string to update GUI titlebar
+function settitle {
+    _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
+
+    # if an interactive session
+    if [[ -t 0 ]]; then	
+	if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+	    # replace spaces with percent sign for pathnames
+	    # with spaces
+	    SEARCH=' '
+	    REPLACE='%20'
+	    PWD_URL="${PWD//$SEARCH/$REPLACE}"
+      	    printf "\033]0;$SYS\007"
+	    printf "\033]6;\007"
+	    printf "\033]7;file:$PWD_URL\007"
+	elif [[ "$TERM" == *"xterm"* ]]; then
+	    if [[ -n "$KSH_VERSION" ]]; then
+       		TMP_PWD=$(shortpath "$_PWD")
+	    else
+		TMP_PWD=$(shortpath "$_PWD")
+	    fi
+	    # clear out previous title bar
+	    printf "\033]0;\007"
+	    printf "\033]1;\007"
+	    printf "\033]2;\007"
+	    printf "\033]6;\007"
+	    printf "\033]7;\007"
+	    printf "\033]2;%s\007" "$SYS:$TMP_PWD"
+	fi
+    fi
+}
+
+# Set the prompt
+function setprompt {
+    _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
+
+    # Read only directories are Red.
+    if [[ ! -w "${PWD}" ]] ; then
+	CPWD="${Rc}${_PWD}${Nc}"
+    else
+	CPWD=$_PWD
+    fi
+
+    if [[ $TERM == "dumb" ]]; then
+	case $UID in
+	    0)   # Root prompt
+		PS1="[${LOGNAME}${SYS}:${CPWD}# $"
+		PS2=">  "
+		;;
+	    *)   # User prompt
+		# ${LOGNAME} for login name
+		PS1="${HIST}[${SYS}:${CPWD}]$ "
+		PS2=">  "
+		;;
+	esac
+    else
+	case $UID in
+	    0)   # Root prompt
+		_PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS}${Rc}:${Nc}${Wc}\
+${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
+		_PS2="${Rc}>  ${Nc}"
+		;;
+	    *)   # User prompt
+		# ${LOGNAME} for login name
+		_PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+		#_PS1="[${SYS}:${CPWD}] "
+		_PS2="${Bc}>  ${Nc}"
+		;;
+	esac
+
+	PS1=$(echo -ne $(settitle) >/dev/tty)$(echo -ne ${_PS1})
+	PS2=$(echo -ne ${_PS2})
+    fi
+}

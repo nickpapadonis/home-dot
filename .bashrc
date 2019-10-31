@@ -13,7 +13,7 @@ unset notify
 set bell-style visible
 set keymap emacs-meta
 
-[ -f /etc/bashrc ] && . /etc/bashrc
+[[ -f /etc/bashrc ]] && . /etc/bashrc
 shopt -s checkwinsize   # Check window after each command.
 shopt -s dotglob        # files beginning with . to show 'echo *'.
 shopt -s histappend     # Append $HISTSIZE lines to $HISTFILE.
@@ -27,6 +27,31 @@ export HISTFILESIZE=${HISTSIZE:-"2000"}               # maximum number of histor
 # append history vs overwriting it when session is closed
 shopt -s histappend
 
-if [ -f ~/.promptrc ]; then
-    . ~/.promptrc
+if [[ -f ~/.rccmn ]]; then
+    . ~/.rccmn
 fi
+
+tput setaf 4 2>/dev/null
+case $? in
+  0) # tput works
+     tput sgr0 
+     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 1\n\" | \
+tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 3\n\" | \
+tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 4\n\" | \
+tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | \
+tput -S && printf \"setab 0\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}`tput sgr0`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+  ;;
+  *) # setup the ascii methods.
+     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;33m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;34m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+  ;;
+esac
+
+PROMPT_COMMAND=setprompt

@@ -1,31 +1,46 @@
-#!/bin/bash
+#!/bin/sh
 
-#umask u=rw,g=r,o=
+# umask u=rw,g=r,o=
 umask 077
 
-#export EDITOR=vim
-export PAGER="less -j10 -s -P'--(%pb\%)--'"
-export WXDIFFCMD="diff -bwU5"
-
-# create a history directory if it doesn't exit
-if [ ! -d $HOME/.hist ]; then
-    mkdir -p $HOME/.hist
+if [[ -f /usr/bin/less ]]; then
+    export PAGER="less -j10 -s -P'--(%pb\%)--'"
+    #export PAGER="/usr/bin/less -ins"
+elif [[ -f /usr/bin/more ]]; then
+    export PAGER="/usr/bin/more -s"
 fi
 
-# deletes process history if the process is not active, these
-# are assume exited bash sessions.  note this is only valid
-# for single system.
-function purge_hist {
-    for i in $(comm -23 <(sort -n <(ls $HOME/.hist/history.* | sed "s#$HOME/.hist/history.##"))  <(sort <(for i in $(ps -ex -o pid | sed 1d); do echo $i ; done))); do echo "$HOME/.hist/history.$i"; done | xargs rm
-}
+# This function updates the interactive prompt.
+# Note the id(1) usage to work-around Solaris (without having to
+# choose xpg4 id that supports -u).
+if [[ -z $UID ]] ; then
+    UID=`id | cut -d'(' -f1 | cut -c5-`
+fi
+
+export EDITOR="emacs"
+export WXDIFFCMD="diff -bwU5"
 
 #export PYTHONPATH=$HOME/lib/python:$PYTHONPATH
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
 
 ## GNU grep, if available, has colorized output.
-grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && alias grep='grep --color=auto'
-
-[ "`basename $EDITOR`" = "vim" ] && alias vi='vim'
-
+# grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && alias grep='grep --color=auto'
+export HOSTNAME=$(hostname)
+export SYS=`echo $HOSTNAME | sed 's|\..*||'`
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
+
+
+# check for human readable ( -h )
+ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
+
+# check for GNU ls (colorful list)
+
+ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
+
+LS_COLOUR=""
+
+alias l.='ls -lAdF ${H} ${LS_COLOUR} .*'    # list only hidden things
+alias la='ls -lAF ${H} ${LS_COLOUR}'        # list all
+alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
+alias ls='ls -F ${LS_COLOUR}'               # list with flags

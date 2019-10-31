@@ -1,3 +1,3 @@
-if [ -f ~/.promptrc ]; then
+if [[ -f ~/.promptrc ]]; then
     . ~/.logout
 fi

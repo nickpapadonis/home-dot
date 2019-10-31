@@ -6,27 +6,28 @@ SYSPATH="/usr/local/bin:/usr/xpg6/bin:/usr/xpg4/bin:/bin:/usr/bin:/usr/etc:/usr/
 export PATH=$PATH:$SYSPATH
 export MANPATH=$MANPATH:/usr/share/man
 
-TMP=/tmp/np142837
-if [ ! -d $TMP ]; then
-    mkdir /tmp/np142837
-fi
-
-if [ `uname -r` == "5.10" ]; then 
+if [[ `uname -r` == "5.10" ]]; then 
     alias screen="/usr/dist/share/screen,v4.00.03/5lib.sun4/screen -T xterm"
     alias more=/usr/xpg4/bin/more
-    if [ ! -f /opt/sfw/bin/vim ]; then
+    if [[ ! -f /opt/sfw/bin/vim ]]; then
       alias vim=/opt/SUNWspro/SOS10/contrib/vim/bin/vim
     fi
 fi
 
-if [ -f /pkg/gnu/bin/bash ]; then
+ECHOE='echo -ne'
+[[ "`uname -s`" == "SunOS" ]] && \
+    [[ "`uname -r`" == "5.11" ]] && \
+    [[ -x "/usr/gnu/bin/echo" ]] && \
+    ECHOE='/usr/gnu/bin/echo -ne'
+
+if [[ -f /pkg/gnu/bin/bash ]]; then
     alias bash=/pkg/gnu/bin/bash
 fi
 
-if [ -f /pkg/gnu/bin/less ]; then
+if [[ -f /pkg/gnu/bin/less ]]; then
     alias less=/pkg/gnu/bin/less
 fi
 
-if [ -f /pkg/gnu/bin/grep ]; then
+if [[ -f /pkg/gnu/bin/grep ]]; then
     alias grep=/pkg/gnu/bin/grep
 fi
