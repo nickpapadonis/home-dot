@@ -166,31 +166,38 @@ function setprompt {
     fi
 
     # This function updates the interactive prompt.
-<<<<<<< HEAD
     # Note the id(1) usage to work-around Solaris (without having to
     # choose xpg4 id that supports -u).
     UID=`id | cut -d'(' -f1 | cut -c5-`
-=======
-    # Note the id(1) usage to work-around Solaris (without having to choose xpg4 id that supports -u).
-    if [ -z $UID ] ; then
-        UID=`id | cut -d'(' -f1 | cut -c5-`
-    fi
->>>>>>> 36340f9f46d8fdc9ca72cc0536796fe4076dcf85
 
-    case $UID in
-	0)   # Root prompt
-	    _PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}\
+    if [[ $TERM == "dumb" ]]; then
+	case $UID in
+	    0)   # Root prompt
+		_PS1="[${LOGNAME}${SYS_}:${CPWD}# $"
+		_PS2=">  "
+		;;
+	    *)   # User prompt
+		# ${LOGNAME} for login name
+		_PS1="\! [${SYS}:${CPWD}]$ "
+		_PS2=">  "
+		;;
+	esac
+    else
+	case $UID in
+	    0)   # Root prompt
+		_PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS_}${Rc}:${Nc}${Wc}\
 ${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
-	    _PS2="${Rc}>  ${Nc}"
-	    ;;
-	*)   # User prompt
-	    # ${LOGNAME} for login name
-	    _PS1="\! ${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-	    #_PS1="[${SYS}:${CPWD}] "
-	    _PS2="${Bc}>  ${Nc}"
-	    ;;
-    esac
-
+		_PS2="${Rc}>  ${Nc}"
+		;;
+	    *)   # User prompt
+		# ${LOGNAME} for login name
+		_PS1="\! ${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+		#_PS1="[${SYS}:${CPWD}] "
+		_PS2="${Bc}>  ${Nc}"
+		;;
+	esac
+    fi
+	
     gettitle
     PS1=$(echo $TITLE >/dev/tty)`echo ${_PS1}`
     PS2=`echo ${_PS2}`
@@ -230,10 +237,10 @@ ECHOE='echo -ne'
 
 
 # For some reason OSX reports ksh as SHELL=bash
-if [[ "$0" = *"ksh"* ]] ; then
+if [[ $SHELL = *"ksh"* ]] ; then
     alias cd="prompt_cd"
     alias ..='prompt_cd ".." ; printf "$PWD\n"'
-elif [[ "$0" == *"bash"* ]] ; then
+elif [[ "$SHELL" == *"bash"* ]] ; then
     PROMPT_COMMAND=setprompt
 fi
 

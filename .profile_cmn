@@ -12,6 +12,13 @@ if [ ! -d $HOME/.hist ]; then
     mkdir -p $HOME/.hist
 fi
 
+# deletes process history if the process is not active, these
+# are assume exited bash sessions.  note this is only valid
+# for single system.
+function purge_hist {
+    for i in $(comm -23 <(sort -n <(ls $HOME/.hist/history.* | sed "s#$HOME/.hist/history.##"))  <(sort <(for i in $(ps -ex -o pid | sed 1d); do echo $i ; done))); do echo "$HOME/.hist/history.$i"; done | xargs rm
+}
+
 #export PYTHONPATH=$HOME/lib/python:$PYTHONPATH
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
