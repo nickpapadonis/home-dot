@@ -6,7 +6,7 @@ elif [ "$TERM_PROGRAM" == *"xterm"* ]; then
 fi
 
 # Clear console if top level shell
-if [ $IS_LINUX == 1 ] || [ $IS_SOL ]; then
+if [[ $IS_LINUX == 1 || $IS_SOL ]]; then
     if [ "$SHLVL" = 1 ]; then
         [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
     fi

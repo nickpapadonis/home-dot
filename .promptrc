@@ -28,7 +28,7 @@
 
 tput setaf 4 2>/dev/null
 case $? in
-  0) # tput works.
+  0) # tput works
      tput sgr0 
      Rc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 1\n\" | \
 tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
@@ -36,9 +36,15 @@ tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
 tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
      Bc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 4\n\" | \
 tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | \
+     if [[ "$0" == *"ksh"* ]] ; then
+	 # ksh has problems with bold, so no bold
+	 Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     else
+	 Wc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 7\nbold\n\" | \
 tput -S && printf \"setab 0\n\" | tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}`tput sgr0`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Nc="${BASH:+\\[}${ZSH_VERSION:+%{}`tput sgr0`${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     fi
   ;;
   *) # setup the ascii methods.
      Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
@@ -54,7 +60,6 @@ SPATHLEN=40
 
 # These functions truncate the path so it will fit somewhere
 
-# works with ksh93 and bash
 # uses long/.../path
 function shortpath_new_trunc {
     pwd_length=$SPATHLEN
@@ -105,12 +110,10 @@ function shortpath {
 export HOSTNAME=$(hostname)
 
 # Construct a string to update GUI titlebar
-# Result TITLE=<title>
-function gettitle {
+function settitle {
     SYS=`echo $HOSTNAME | sed 's|\..*||'`
 
     _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
-    # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
 
     # if an interactive session
     if [ -t 0 ]; then	
@@ -120,35 +123,24 @@ function gettitle {
 	    SEARCH=' '
 	    REPLACE='%20'
 	    PWD_URL="${PWD//$SEARCH/$REPLACE}"
-	    #titlebar "${SYS} : ${PWD##*/}"
-      	    TITLE=$($ECHOE "\033]0;$SYS\007")
-	    TITLE=${TITLE}$($ECHOE "\033]6;\007")
-	    TITLE=${TITLE}$($ECHOE "\033]7;file:$PWD_URL\007")
+      	    printf "\033]0;$SYS\007"
+	    printf "\033]6;\007"
+	    printf "\033]7;file:$PWD_URL\007"
 	elif [[ "$TERM" == *"xterm"* ]]; then
 	    if [ -n "$KSH_VERSION" ]; then
-       		TMP_PWD=$(shortpath_new_trunc "$_PWD")
+       		TMP_PWD=$(shortpath "$_PWD")
 	    else
-		TMP_PWD=$(shortpath_new_trunc "$_PWD")
+		TMP_PWD=$(shortpath "$_PWD")
 	    fi
 	    # clear out previous title bar
-	    TITLE=$($ECHOE "\033]0;\007")
-	    TITLE=${TITLE}$(printf "\033]1;\007")
-	    TITLE=${TITLE}$(printf "\033]2;\007")
-	    TITLE=${TITLE}$($ECHOE "\033]6;\007")
-	    TITLE=${TITLE}$($ECHOE "\033]7;\007")
-	    #$ECHOE "\033]0;$SYS\007"
-	    #printf "\033]1;%s\007" "$SYS"
-	    TITLE=${TITLE}$(printf "\033]2;%s\007" "$SYS:$TMP_PWD")
-	    #$ECHOE "\033]6;\007"
-	    #$ECHOE "\033]7;file:$PWD_URL\007"
+	    printf "\033]0;\007"
+	    printf "\033]1;\007"
+	    printf "\033]2;\007"
+	    printf "\033]6;\007"
+	    printf "\033]7;\007"
+	    printf "\033]2;%s\007" "$SYS:$TMP_PWD"
 	fi
     fi
-}
-
-# Set the titlebar with the following string
-function settitle {
-    gettitle
-    $ECHOE $TITLE
 }
 
 # Set the prompt
@@ -156,7 +148,6 @@ function setprompt {
     SYS=`echo $HOSTNAME | sed 's|\..*||'`
 
     _PWD=$(echo $PWD| sed "s;$HOME;~;") # strip home directory
-  # _PWD=$(echo $_PWD | sed "s/${HOME//\//\\\/}/~/g")
 
     # Read only directories are Red.
     if [ ! -w "${PWD}" ] ; then
@@ -168,18 +159,20 @@ function setprompt {
     # This function updates the interactive prompt.
     # Note the id(1) usage to work-around Solaris (without having to
     # choose xpg4 id that supports -u).
-    UID=`id | cut -d'(' -f1 | cut -c5-`
-
+    if [[ -z $UID ]] ; then
+	UID=`id | cut -d'(' -f1 | cut -c5-`
+    fi
+	
     if [[ $TERM == "dumb" ]]; then
 	case $UID in
 	    0)   # Root prompt
-		_PS1="[${LOGNAME}${SYS_}:${CPWD}# $"
-		_PS2=">  "
+		PS1="[${LOGNAME}${SYS_}:${CPWD}# $"
+		PS2=">  "
 		;;
 	    *)   # User prompt
 		# ${LOGNAME} for login name
-		_PS1="\! [${SYS}:${CPWD}]$ "
-		_PS2=">  "
+		PS1="\! [${SYS}:${CPWD}]$ "
+		PS2=">  "
 		;;
 	esac
     else
@@ -196,19 +189,19 @@ ${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
 		_PS2="${Bc}>  ${Nc}"
 		;;
 	esac
+
+	PS1=$($ECHOE $(settitle) >/dev/tty)$($ECHOE ${_PS1})
+	PS2=$($ECHOE ${_PS2})
     fi
-	
-    gettitle
-    PS1=$(echo $TITLE >/dev/tty)`echo ${_PS1}`
-    PS2=`echo ${_PS2}`
-    
-    unset SYS _PWD
+    unset SYS _PWD TITLE CPWD
 }
 
 prompt_cd() {
+    ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
+    command 'cd' "$@" && setprompt && settitle
     ## ksh88 support - "\cd" is an alternative to avoid functions.
     ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-    \cd "${@:-"$HOME"}" && setprompt
+    #\cd "${@:-"$HOME"}" && setprompt && settitle
 }
 
 if [[ $VISUAL != "" ]]; then
@@ -266,7 +259,7 @@ alias ls='ls -F ${LS_COLOUR}'               # list with flags
 
 # print the name of the invoked command to the title bar
 # Apple_Terminal already has scripts to do this in /etc
-if [[ "$TERM" == *"xterm"* ]]; then
+if [[ "$TERM" == *"xterm"* && "$0" == *"bash"* ]]; then
     trap 'printf "\033];%s\007" "${BASH_COMMAND//[^[:print:]]/}" >&2' DEBUG
 fi
 
