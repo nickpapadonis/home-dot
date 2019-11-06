@@ -12,6 +12,7 @@ export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly
 # run logout script on logout
 trap '. $HOME/.logout; exit' 0
 
+HIST="\! "
 if [[ -f ~/.rccmn ]]; then
     . ~/.rccmn
 fi
