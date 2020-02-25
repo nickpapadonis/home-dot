@@ -45,14 +45,10 @@ function prompt_cd {
     command 'cd' "$@" && setprompt && settitle
     ## ksh88 support - "\cd" is an alternative to avoid functions.
     ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-    #\cd "${@:-"$HOME"}" && setprompt && settitle
+    #cd "${@:-"$HOME"}" && setprompt && settitle
 }
 
 alias cd="prompt_cd"
 alias ..='prompt_cd ".." ; printf "$PWD\n"'
-
-## ksh88 support - "\cd" is an alternative to avoid functions.
-## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-#\cd "${@:-"$HOME"}" && setprompt && settitle
 
 setprompt && settitle
