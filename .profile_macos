@@ -1,8 +1,3 @@
-rmd () {
-  pandoc $1 | lynx -stdin
-}
-export idrive=~/Library/Mobile\ Documents/com~apple~CloudDocs
-alias ic="cd \"$idrive\""
 export PATH=$PATH:~/bin:~/go/bin
 
 # CTRL-S is reserved for XON/XOFF flow control

@@ -1,14 +1,18 @@
 # create a history directory if it doesn't exit
-if [[ ! -d $HOME/.hist ]]; then
-    mkdir -p $HOME/.hist
-fi
+#if [[ ! -d $HOME/.hist ]]; then
+#    mkdir -p $HOME/.hist
+#fi
 
 # deletes process history if the process is not active, these
 # are assume exited bash sessions.  note this is only valid
 # for single system.
-function purge_hist {
-    for i in $(comm -23 <(sort -n <(ls $HOME/.hist/history.* | sed "s#$HOME/.hist/history.##"))  <(sort <(for i in $(ps -ex -o pid | sed 1d); do echo $i ; done))); do echo "$HOME/.hist/history.$i"; done | xargs rm
-}
+#function purge_hist {
+#    for i in $(comm -23 <(sort -n <(ls $HOME/.hist/history.* | sed "s#$HOME/.hist/history.##"))  <(sort <(for i in $(ps -ex -o pid | sed 1d); do echo $# i ; done))); do echo "$HOME/.hist/history.$i"; done | xargs rm -f
+#}
+
+#function view_hist {
+#    strings -n 1 $0
+#}
 
 # Title Bar path will be truncated to this max length
 SPATHLEN=40
@@ -101,7 +105,7 @@ function setprompt {
     fi
 
     if [[ $TERM == "dumb" ]]; then
-	case $UID in
+       case $UID in
 	    0)   # Root prompt
 		PS1="[${LOGNAME}${SYS}:${CPWD}# $"
 		PS2=">  "
@@ -124,9 +128,8 @@ ${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
 		_PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
 		#_PS1="[${SYS}:${CPWD}] "
 		_PS2="${Bc}>  ${Nc}"
-		;;
+		;;	
 	esac
-	
 	PS1=$(echo -ne $(settitle) >/dev/tty)$(echo -ne ${_PS1})
 	PS2=$(echo -ne ${_PS2})
     fi

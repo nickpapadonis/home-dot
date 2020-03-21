@@ -1,0 +1,1 @@
+;;(load-option 'format) (load "~/.emacs.d/lisp/swank.scm" (->environment '(runtime swank)))

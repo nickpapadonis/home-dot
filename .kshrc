@@ -4,7 +4,8 @@ fi
 
 set -o globstar
 export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
-export HISTFILE="$HOME/.hist/history.$$" # Default is ~/.sh_history.
+#export HISTFILE="$HOME/.hist/history.$$" # Default is ~/.sh_history.
+export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
 export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
 export HISTEDIT=${HISTEDIT:-"$VISUAL"}            # History editor ; replaces obsolete var FCEDIT.
 export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
@@ -32,12 +33,14 @@ tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
      Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
   ;;
   *) # setup the ascii methods.
-     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;33m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;34m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-  ;;
+     if [[ $TERM != "dumb" ]]; then
+	 Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Yc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;33m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Bc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;34m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+	 Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
+     fi
+   ;;
 esac
 
 function prompt_cd {

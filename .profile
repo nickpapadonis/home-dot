@@ -1,10 +1,11 @@
 #!/bin/sh
 
-if [[ `uname` == "Linux" ]]; then
+NAME=$(uname)
+if [[ $NAME == "Linux" ]]; then
     export IS_LINUX=1
-elif [[ `uname` == "SunOS" ]]; then
+elif [[ $NAME == "SunOS" ]]; then
     export IS_SOE=1
-elif [[ `uname` == "Darwin" ]]; then
+elif [[ $NAME == "Darwin" ]]; then
     export IS_MACOS=1
 fi
 
