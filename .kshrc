@@ -3,6 +3,8 @@ if [[ $- = *i* ]]; then
 fi
 
 set -o globstar
+set -o emacs
+
 export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
 #export HISTFILE="$HOME/.hist/history.$$" # Default is ~/.sh_history.
 export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.

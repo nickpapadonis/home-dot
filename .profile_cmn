@@ -1,18 +1,16 @@
-#!/bin/sh
-
 # umask u=rw,g=r,o=
 umask 077
 
-if [[ -f /usr/bin/less ]]; then
+if [ -f /usr/bin/less ]; then
     export PAGER="less -j10 -s -P'--(%pb\%)--'"
-elif [[ -f /usr/bin/more ]]; then
+elif [ -f /usr/bin/more ]; then
     export PAGER="/usr/bin/more -s"
 fi
 
 # This function updates the interactive prompt.
 # Note the id(1) usage to work-around Solaris (without having to
 # choose xpg4 id that supports -u).
-if [[ -z $UID ]] ; then
+if [ -z $UID ] ; then
     UID=`id | cut -d'(' -f1 | cut -c5-`
 fi
 
@@ -24,7 +22,6 @@ export WXDIFFCMD="diff -bwU5"
 
 ## GNU grep, if available, has colorized output.
 # grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && alias grep='grep --color=auto'
-export HOSTNAME=$(hostname)
 export SYS=`echo $HOSTNAME | sed 's|\..*||'`
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
 
