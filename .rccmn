@@ -130,7 +130,7 @@ ${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
 		_PS2="${Bc}>  ${Nc}"
 		;;	
 	esac
-	PS1=$(echo -ne $(settitle) >/dev/tty)$(echo -ne ${_PS1})
-	PS2=$(echo -ne ${_PS2})
+	PS1=$($ECHO $(settitle) >/dev/tty)$($ECHO -ne ${_PS1})
+	PS2=$($ECHO -ne ${_PS2})
     fi
 }

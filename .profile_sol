@@ -1,6 +1,3 @@
-#!/bin/bash
-ECHO="/bin/echo -e"
-
 SYSPATH="/usr/local/bin:/usr/xpg6/bin:/usr/xpg4/bin:/bin:/usr/bin:/usr/etc:/usr/sbin:/usr/ucb:/usr/openwin/bin:/usr/dt/bin:/usr/sfw/bin:/usr/dist/exe:/opt/SUNWut/bin:/usr/ccs/bin"
 
 export PATH=$PATH:$SYSPATH
@@ -12,13 +9,14 @@ if [[ `uname -r` == "5.10" ]]; then
     if [[ ! -f /opt/sfw/bin/vim ]]; then
       alias vim=/opt/SUNWspro/SOS10/contrib/vim/bin/vim
     fi
+    TERM=xterm; export TERM
 fi
 
-ECHOE='echo -ne'
+ECHO=/usr/bin/echo
 [[ "`uname -s`" == "SunOS" ]] && \
     [[ "`uname -r`" == "5.11" ]] && \
     [[ -x "/usr/gnu/bin/echo" ]] && \
-    ECHOE='/usr/gnu/bin/echo -ne'
+    ECHO='/usr/gnu/bin/echo -ne'
 
 if [[ -f /pkg/gnu/bin/bash ]]; then
     alias bash=/pkg/gnu/bin/bash
