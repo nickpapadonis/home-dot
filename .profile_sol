@@ -1,4 +1,3 @@
-ECHO="/bin/echo -e"
 SYSPATH="/usr/local/bin:/usr/xpg6/bin:/usr/xpg4/bin:/bin:/usr/bin:/usr/etc:/usr/sbin:/usr/ucb:/usr/openwin/bin:/usr/dt/bin:/usr/sfw/bin:/usr/dist/exe:/opt/SUNWut/bin:/usr/ccs/bin"
 
 export PATH=$PATH:$SYSPATH
@@ -13,11 +12,12 @@ if [[ `uname -r` == "5.10" ]]; then
     TERM=xterm; export TERM
 fi
 
-ECHOE='echo -ne'
-[[ "`uname -s`" == "SunOS" ]] && \
-    [[ "`uname -r`" == "5.11" ]] && \
-    [[ -x "/usr/gnu/bin/echo" ]] && \
-    ECHOE='/usr/gnu/bin/echo -ne'
+ECHO=/usr/bin/echo
+if [ "`uname -r`" = "5.11" ] && \
+    [ -x "/usr/gnu/bin/echo" ]; then
+    ECHO='/usr/gnu/bin/echo -ne'
+fi
+export ECHO
 
 if [[ -f /pkg/gnu/bin/bash ]]; then
     alias bash=/pkg/gnu/bin/bash

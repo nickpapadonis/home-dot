@@ -10,6 +10,12 @@ elif [ "$NAME" = "Darwin" ]; then
 fi
 
 HOSTNAME=`hostname`
+
+# source env variables for common
+if [ -f ~/.profile_cmn ]; then
+    . ~/.profile_cmn
+fi
+
 # source env variables for platform
 if [ -n "$IS_LINUX" ]; then
     if [ -f ~/.profile_lnx ]; then
@@ -25,7 +31,3 @@ elif [ -n "$IS_MACOS" ]; then
     fi
 fi
 
-# source env variables for common
-if [ -f ~/.profile_cmn ]; then
-    . ~/.profile_cmn
-fi

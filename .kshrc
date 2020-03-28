@@ -2,18 +2,24 @@ if [[ $- = *i* ]]; then
     HAVE_TTY=1
 fi
 
-set -o globstar
-set -o emacs
+if [ -z $KSH_VERSION ]; then
+    KSH_88=1
+fi
+
+if [ -z $KSH_88 ]; then
+    set -o globstar
+fi
 
 export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
-#export HISTFILE="$HOME/.hist/history.$$" # Default is ~/.sh_history.
 export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
 export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
 export HISTEDIT=${HISTEDIT:-"$VISUAL"}            # History editor ; replaces obsolete var FCEDIT.
 export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
 
 # run logout script on logout
-trap '. $HOME/.logout; exit' 0
+if [ -z $KSH_88 ]; then
+   trap '. $HOME/.logout; exit' 0
+fi
 
 HIST="\! "
 if [[ -f ~/.rccmn ]]; then
@@ -48,12 +54,8 @@ esac
 function prompt_cd {
     ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
     command 'cd' "$@" && setprompt && settitle
-    ## ksh88 support - "\cd" is an alternative to avoid functions.
-    ## Prevents the recursive alias expansion problem that the builtin command would otherwise handle.
-    #cd "${@:-"$HOME"}" && setprompt && settitle
 }
 
 alias cd="prompt_cd"
-alias ..='prompt_cd ".." ; printf "$PWD\n"'
 
 setprompt && settitle

@@ -67,7 +67,7 @@ if has ("autocmd")
     \ if line("'\"") > 0 && line ("'\"") <= line("$") |
     \   exe "normal g'\"" |
     \ endif
-    
+
     augroup default
     "autocmd BufEnter * set textwidth=72 ai formatoptions=tcqn
     augroup END

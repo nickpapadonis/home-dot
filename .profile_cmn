@@ -1,3 +1,5 @@
+HOSTNAME=`hostname`
+
 # umask u=rw,g=r,o=
 umask 077
 
@@ -16,14 +18,14 @@ fi
 
 export EDITOR="emacs"
 export WXDIFFCMD="diff -bwU5"
-
+export ECHO="echo"
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
 
 ## GNU grep, if available, has colorized output.
 # grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && alias grep='grep --color=auto'
 export SYS=`echo $HOSTNAME | sed 's|\..*||'`
-export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
+export PATH=$HOME/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
 
 
 # check for human readable ( -h )

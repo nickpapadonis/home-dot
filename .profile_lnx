@@ -1,1 +1,2 @@
 export INFOPATH="$HOME/info:/usr/share/info"
+export ECHO="echo -ne"
