@@ -1,4 +1,6 @@
 #!/bin/bash
+ECHO=${ECHO:="echo"}
+
 shopt -s expand_aliases
 
 # use a visible bell if one is available
@@ -27,6 +29,7 @@ export HISTFILESIZE=${HISTSIZE:-"2000"}               # maximum number of histor
 # append history vs overwriting it when session is closed
 # shopt -s histappend
 
+HIST="\! "
 if [[ -f ~/.rccmn ]]; then
     . ~/.rccmn
 fi
