@@ -13,10 +13,11 @@ if [[ `uname -r` == "5.10" ]]; then
 fi
 
 ECHO=/usr/bin/echo
-[[ "`uname -s`" == "SunOS" ]] && \
-    [[ "`uname -r`" == "5.11" ]] && \
-    [[ -x "/usr/gnu/bin/echo" ]] && \
+if [ "`uname -r`" = "5.11" ] && \
+    [ -x "/usr/gnu/bin/echo" ]; then
     ECHO='/usr/gnu/bin/echo -ne'
+fi
+export ECHO
 
 if [[ -f /pkg/gnu/bin/bash ]]; then
     alias bash=/pkg/gnu/bin/bash

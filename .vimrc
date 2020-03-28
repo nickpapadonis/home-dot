@@ -62,12 +62,6 @@ set nowb
 set noswapfile
 
 if has ("autocmd")
-    " Automatically go to last place in file
-    autocmd BufReadPost *
-    \ if line("'\"") > 0 && line ("'\"") <= line("$") |
-    \   exe "normal g'\"" |
-    \ endif
-    
     augroup default
     "autocmd BufEnter * set textwidth=72 ai formatoptions=tcqn
     augroup END

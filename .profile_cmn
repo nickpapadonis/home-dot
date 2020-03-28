@@ -1,3 +1,5 @@
+HOSTNAME=`hostname`
+
 # umask u=rw,g=r,o=
 umask 077
 
