@@ -104,7 +104,7 @@ function setprompt {
 	CPWD=$_PWD
     fi
 
-    if [[ $TERM == "dumb" ]]; then
+    if [ $TERM = "dumb" -o $TERM = "emacs" ]; then
        case $UID in
 	    0)   # Root prompt
 		PS1="[${LOGNAME}${SYS}:${CPWD}# $"
