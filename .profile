@@ -9,8 +9,6 @@ elif [ "$NAME" = "Darwin" ]; then
     IS_MACOS=1; export IS_MACOS
 fi
 
-HOSTNAME=`hostname`
-
 # source env variables for common
 if [ -f ~/.profile_cmn ]; then
     . ~/.profile_cmn
