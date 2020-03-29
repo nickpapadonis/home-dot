@@ -14,7 +14,7 @@ ECHO=${ECHO:="echo"}
 export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
 export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
 export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
-export HISTEDIT=${HISTEDIT:-"$VISUAL"}            # History editor ; replaces obsolete var FCEDIT.
+export HISTEDIT=${HISTEDIT:-"$EDITOR"}            # History editor ; replaces obsolete var FCEDIT.
 export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
 
 # run logout script on logout

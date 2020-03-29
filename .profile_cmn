@@ -16,9 +16,15 @@ if [ -z $UID ] ; then
     UID=`id | cut -d'(' -f1 | cut -c5-`
 fi
 
-export EDITOR="emacs"
+# priortize emacs
+export VISUAL="emacs"
+if [ -f "`which emacs`" ]; then
+    export EDITOR="emacs"
+elif [ -f "`which vim`" ]; then
+    export EDITOR="vi"
+fi
+
 export WXDIFFCMD="diff -bwU5"
-export ECHO="echo"
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
 
