@@ -4,7 +4,7 @@ if [ "$TERM" != "dumb" ]; then
 fi
 
 # Clear console if top level shell
-if [[ $SHLVL = 1 ]]; then
-    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
-    [ -x /usr/bin/clear ] && /usr/bin/clear
-fi
+#if [[ $SHLVL = 1 ]]; then
+#    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#    [ -x /usr/bin/clear ] && /usr/bin/clear
+#fi
