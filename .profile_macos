@@ -1,5 +1,4 @@
-export PATH=$PATH:~/bin:~/go/bin
-export ECHO="echo -ne"
+export PATH=$PATH:~/bin
 # CTRL-S is reserved for XON/XOFF flow control
 # remove so CTRL-S can be used
 #stty -ixon -ixoff
