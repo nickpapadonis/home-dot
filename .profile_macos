@@ -4,6 +4,7 @@ export PATH=$PATH:~/bin
 #stty -ixon -ixoff
 stty -ixon
 
+export GIT_EDITOR="vi"
 # CTRL-O discarded by terminal, fix
 stty discard undef
 
