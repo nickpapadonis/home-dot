@@ -82,6 +82,10 @@ There are two things you can do about this warning:
 ;(setq geiser-mode-start-repl-p t)
 ;(setq geiser-active-implementations '(mit))
 
+;; work around ksh print ^L when window is resized issue
+;; Bug 40589 40732 40735
+(setq window-adjust-process-window-size-function 'ignore)
+
 (when (version<= "26.0.50" emacs-version)
   (global-display-line-numbers-mode))
 (custom-set-variables
