@@ -105,32 +105,13 @@ function setprompt {
     fi
 
     if [[ $TERM == "dumb" ]]; then
-       case $UID in
-	    0)   # Root prompt
-		PS1="[${LOGNAME}${SYS}:${CPWD}# $"
-		PS2=">  "
-		;;
-	    *)   # User prompt
-		# ${LOGNAME} for login name
-		PS1="${HIST}[${SYS}:${CPWD}]$ "
-		PS2=">  "
-		;;
-	esac
+        PS1="${HIST}[${SYS}:${CPWD}]$ "
+        PS2=">  "
     else
-	case $UID in
-	    0)   # Root prompt
-		_PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS}${Rc}:${Nc}${Wc}\
-${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
-		_PS2="${Rc}>  ${Nc}"
-		;;
-	    *)   # User prompt
-		# ${LOGNAME} for login name
-		_PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-		#_PS1="[${SYS}:${CPWD}] "
-		_PS2="${Bc}>  ${Nc}"
-		;;	
-	esac
-	PS1=$($ECHO $(settitle) >/dev/tty)$($ECHO -ne ${_PS1})
-	PS2=$($ECHO -ne ${_PS2})
+        # ${LOGNAME} for login name
+        _PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+        _PS2="${Bc}>  ${Nc}"
     fi
+    PS1=$($ECHO $(settitle) >/dev/tty)$($ECHO ${_PS1})
+    PS2=$($ECHO ${_PS2})
 }

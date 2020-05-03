@@ -1,5 +1,5 @@
 #!/bin/bash
-ECHO=${ECHO:="echo"}
+ECHO=${ECHO:="echo -ne"}
 
 shopt -s expand_aliases
 

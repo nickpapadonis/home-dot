@@ -10,7 +10,7 @@ if [ -z $KSH_88 ]; then
     set -o globstar
 fi
 
-ECHO=${ECHO:="echo"}
+ECHO=${ECHO:="echo -ne"}
 export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
 export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
 export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
