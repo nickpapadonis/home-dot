@@ -83,9 +83,9 @@ function setprompt {
         # ${LOGNAME} for login name
         _PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
         _PS2="${Bc}>  ${Nc}"
+	PS1=$(echo -ne $(settitle) >/dev/tty)$(echo -ne ${_PS1})
+	PS2=$(echo -ne ${_PS2})
     fi
-    PS1=$(echo -ne $(settitle) >/dev/tty)$(echo -ne ${_PS1})
-    PS2=$(echo -ne ${_PS2})
 }
 
 precmd() { setprompt }

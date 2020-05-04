@@ -111,7 +111,7 @@ function setprompt {
         # ${LOGNAME} for login name
         _PS1="${HIST}${Bc}[${Nc}${SYS}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
         _PS2="${Bc}>  ${Nc}"
+	PS1=$($ECHO $(settitle) >/dev/tty)$($ECHO ${_PS1})
+	PS2=$($ECHO ${_PS2})
     fi
-    PS1=$($ECHO $(settitle) >/dev/tty)$($ECHO ${_PS1})
-    PS2=$($ECHO ${_PS2})
 }
