@@ -55,6 +55,9 @@ There are two things you can do about this warning:
 	      Info-directory-list))
 (global-set-key (kbd "C-h TAB") 'info-lookup-symbol)
 
+;; To quickly recompile
+(global-set-key (kbd "C-c c") 'recompile)
+
 ;; (auto-complete-mode)
 ;; TAB, list RET
 ;; completion in geiser
