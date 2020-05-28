@@ -106,3 +106,12 @@ There are two things you can do about this warning:
  ;; If there is more than one, they won't work right.
  )
 
+(defun del-binary_characters (beg end)
+  "Delete binary characters in a region"
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (while (re-search-forward "[^[:ascii:]]" nil t)
+        (replace-match "")))))
