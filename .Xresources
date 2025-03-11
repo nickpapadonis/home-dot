@@ -5,6 +5,10 @@
 !xterm.vt100.locale: true
 !xterm*utf8: 1
 
+# Meta characters are converted into a two character sequence
+# with the character itself preceded by ESC.
+xterm*eightBitInput: false
+
 ! For fixed font
 xterm.*.font: -bitstream-terminal-medium-r-normal--18-*-*-*-*-*-*-1
 !xterm*font: -dec-terminal-medium-r-normal--14-*-*-*-*-*-*-1
