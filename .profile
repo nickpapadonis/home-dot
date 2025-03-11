@@ -1,31 +1,12 @@
 #!/bin/sh
 
-NAME=`uname`
-if [ "$NAME" = "Linux" ]; then
-    IS_LINUX=1; export IS_LINUX
-elif [ "$NAME" = "SunOS" ]; then
-    IS_SOL=1; export IS_SOL
-elif [ "$NAME" = "Darwin" ]; then
-    IS_MACOS=1; export IS_MACOS
-fi
+# new session do not need to source profile for shell anymore
+F=~/.profile-resource
+[ -f $F ] && rm $F
 
-# source env variables for common
-if [ -f ~/.profile_cmn ]; then
-    . ~/.profile_cmn
-fi
+# set ~/.profile-resource if you've changed any profile dotfiles
+# and each interactive shell will source ~/.profile_ again
 
-# source env variables for platform
-if [ -n "$IS_LINUX" ]; then
-    if [ -f ~/.profile_lnx ]; then
-	. ~/.profile_lnx
-    fi
-elif [ -n "$IS_SOL" ]; then
-    if [ -f ~/.profile_sol ]; then
-	. ~/.profile_sol
-    fi
-elif [ -n "$IS_MACOS" ]; then
-    if [ -f ~/.profile_macos ]; then
-	. ~/.profile_macos
-    fi
-fi
-
+# source to top level profile now
+F=~/.profile_
+[ -f $F ] && source $F

@@ -1,11 +1,14 @@
-export PATH=$PATH:~/bin
 # CTRL-S is reserved for XON/XOFF flow control
 # remove so CTRL-S can be used
 #stty -ixon -ixoff
-stty -ixon
+#stty -ixon
 
-export GIT_EDITOR="vi"
 # CTRL-O discarded by terminal, fix
 stty discard undef
 
-#bind -x '"\C-l": clear'
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
+function locate { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+F=~/.profile_macos-local
+[ -f $F ] && source $F

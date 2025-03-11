@@ -1,2 +1,4 @@
-export INFOPATH="$HOME/info:/usr/share/info"
 export ECHO="echo -ne"
+
+F=~/.profile_lnx-local
+[ -f $F ] && source $F

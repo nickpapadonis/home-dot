@@ -1,35 +1,58 @@
-HOSTNAME=`hostname`
+export HOSTNAME=$(hostname)
 
-# umask u=rw,g=r,o=
-umask 077
+# user, group, other
+# 4 (read), 2 (write), 1 (execute), 0 (none)
+# UGO
+# u=rwx,g=rx,o=
+#   
+#   RWX RWX RWX
+#   6   6   6
+#   110 110 110   defperm_data
+#   7   7   7     defperm_dir_exe
+#   111 111 111
+#
+#   111 000 000   ~umask
+#   000 111 111   umask
+#   0   7   7
+#   defperm AND ~umask = file perm
+#
+#   110 000 000   perm_data
+#   6   0   0
+#   111 000 000   perm_exe
+#   7   0   0
+umask 077  # allow group to RX
 
 if [ -f /usr/bin/less ]; then
-    export PAGER="less -j10 -s -P'--(%pb\%)--'"
+	export PAGER="less -P'--(%p\%,%b)--'"
 elif [ -f /usr/bin/more ]; then
-    export PAGER="/usr/bin/more -s"
+	export PAGER="/usr/bin/more"
 fi
 
 # This function updates the interactive prompt.
 # Note the id(1) usage to work-around Solaris (without having to
 # choose xpg4 id that supports -u).
 if [ -z $UID ] ; then
-    UID=`id | cut -d'(' -f1 | cut -c5-`
+	UID=`id | cut -d'(' -f1 | cut -c5-`
 fi
 
-# priortize emacs
-export VISUAL="emacs"
-if [ -f "`which emacs`" ]; then
-    export EDITOR="emacs"
-elif [ -f "`which vim`" ]; then
-    export EDITOR="vi"
+if [ -f "$(which emacs)" ]; then
+	export VISUAL="emacs"
+	export EDITOR="ed"
+elif [ -f "$(which vim)" ]; then
+	export VISUAL="vim"
+	export EDITOR="vim -e"
+elif [ -f "$(which vi)" ]; then
+	export VISUAL="vi"
+	export EDITOR="vi -e"
+elif [ -f "$(which ed)" ]; then
+	export EDITOR="ed"
 fi
 
-export WXDIFFCMD="diff -bwU5"
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
 
 ## GNU grep, if available, has colorized output.
-# grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && alias grep='grep --color=auto'
+grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && GREP='grep --color=auto'
 export SYS=`echo $HOSTNAME | sed 's|\..*||'`
 export PATH=$HOME/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
 
@@ -41,7 +64,16 @@ ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
 
 #ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
 
-alias l.='ls -lAdF ${H} ${LS_COLOUR} .*'    # list only hidden things
-alias la='ls -lAF ${H} ${LS_COLOUR}'        # list all
-alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
+#alias l.='ls -lAdF ${H} ${LS_COLOUR} .*'    # list only hidden things
+#alias la='ls -lAF ${H} ${LS_COLOUR}'        # list all
+#alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
 alias ls='ls -F ${LS_COLOUR}'               # list with flags
+
+export GIT="$HOME/vbox-shared/git-local"
+export NRG="$HOME/vbox-shared/git-local/nr-demo-MERN-0"
+
+#export CLOUDSDK_PYTHON=/usr/local/opt/python@3.8/libexec/bin/python3
+#export PATH=/usr/local/opt/python@3.8/libexec/bin:$PATH
+
+F=~/.profile_cmn-local
+[ -f $F ] && source $F

@@ -3,7 +3,7 @@ SYSPATH="/usr/local/bin:/usr/xpg6/bin:/usr/xpg4/bin:/bin:/usr/bin:/usr/etc:/usr/
 export PATH=$PATH:$SYSPATH
 export MANPATH=$MANPATH:/usr/share/man
 
-if [[ `uname -r` == "5.10" ]]; then 
+if [[ `uname -r` == "5.10" ]]; then
     alias screen="/usr/dist/share/screen,v4.00.03/5lib.sun4/screen -T xterm"
     alias more=/usr/xpg4/bin/more
     if [[ ! -f /opt/sfw/bin/vim ]]; then

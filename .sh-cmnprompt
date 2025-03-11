@@ -1,0 +1,205 @@
+CTLP="${BASH:+\\[}${ZSH_VERSION:+%{}"
+CTLS="${BASH:+\\]}${ZSH_VERSION:+%\}}"
+
+(exec tput colors) 2>&1 1>/dev/null
+case $? in
+  0) # tput works
+     Rc="${CTLP}`printf \"setaf 1\n\" | tput -S`${CTLS}"
+     Yc="${CTLP}`printf \"setaf 3\n\" | tput -S`${CTLS}"
+     Bc="${CTLP}`printf \"setaf 4\n\" | tput -S`${CTLS}"
+     Wc="${CTLP}`printf \"setaf 7\nbold\n\" | tput -S && printf \"setab 0\n\" | tput -S`${CTLS}"
+     Nc="${CTLP}`tput sgr0`${CTLS}"
+  ;;
+  *) # setup the ascii methods.
+     # "\033[<color_code>m<text>\033[0m"
+     #
+     # \033[ : This is the ANSI escape sequence initiator.
+     # <color_code>m : This is the code for the desired color.
+     # <text> : This is the text you want to colorize.
+     # \033[0m : This is the reset code, which returns the output to the default color.
+     Rc="${CTLP}`printf \"\033[0;31m\"`${CTLS}"
+     Yc="${CTLP}`printf \"\033[0;33m\"`${CTLS}"
+     Bc="${CTLP}`printf \"\033[0;34m\"`${CTLS}"
+     Wc="${CTLP}`printf \"\033[1;37m\"`${CTLS}"
+     Nc="${CTLP}`printf \"\033[0m\"`${CTLS}"
+  ;;
+esac
+
+if [[ -n ${KSH} ]]; then
+	PRINT="print -n"
+elif [[ -n ${ZSH_VERSION} ]]; then
+	PRINT="print"
+else
+	PRINT="ECHO -n"
+fi
+
+# Title Bar path will be truncated to this max length
+SPATHLEN=40
+# uses long/.../path
+function shortpath_new_trunc {
+	pwd_length=${SPATHLEN}
+	pwd_symbol="..."
+	newPWD="${1/#${HOME}/~}"
+	if [ $(echo -n ${newPWD} | wc -c | tr -d " ") -gt ${pwd_length} ]; then
+		newPWD="$(echo -n ${newPWD} | awk -F '/' '{print $1 "/" $2 "/.../" $(NF-1) "/" $(NF)}')";
+	fi
+	echo ${newPWD}
+}
+
+# uses +long/path
+function shortpath_bash {
+	typeset tpwd=${1}
+	typeset more=
+	if [[ ${tpwd} = ${HOME}?\(/*\) ]]; then
+		tpwd=\~${tpwd#$HOME}
+	fi
+	if [[ $(echo -n $tpwd | wc -c | tr -d " ") -gt $SPATHLEN ]]; then
+		newPWD="$(echo -n $tpwd | sed -e "s/.*\(.\{$SPATHLEN\}\)/\1/")"
+		more=+
+	else
+		newPWD="$(echo -n $tpwd)"
+	fi
+	echo "$more$newPWD"
+}
+
+# for ksh88
+# uses +long/path
+function shortpath {
+	typeset tpwd=$1
+	typeset more=
+	# Replace leading $HOME with ~
+	if [[ $tpwd = "$HOME?(/*)" ]]; then
+		tpwd=\~${tpwd#$HOME}
+	fi
+	# Truncate if longer than SPATHLEN chars length
+	if (( ${#tpwd} > $SPATHLEN )); then
+		len=`echo $tpwd | wc -m`
+		start=$(expr $len - $SPATHLEN)
+		tpwd=`echo $tpwd | cut -c$start-$len`
+		more="+"
+	fi
+	printf "$more$tpwd\n"
+}
+
+urlencode_spaceonly () {
+	string=$1
+	while [ -n "$string" ]; do
+		tail=${string#?}
+		head=${string%$tail}
+		case $head in
+			[[:space:]]) printf %%%02x "'$head";;
+			*) printf %c "$head"
+		esac
+		string=$tail
+	done
+	echo
+}
+
+function cleartitle {
+	printf "\033]0;\007" # icon name and window title
+	printf "\033]1;\007" # icon name
+	printf "\033]2;\007" # window title
+	printf "\033]6;\007" # document
+	printf "\033]7;\007" # working directory
+}
+
+function terminate {
+	case $TERM in
+    *xterm*|*rxvt*|dtterm)
+		cleartitle
+		printf "\033]1;terminated\007" # icon name
+		printf "\033]2;terminated\007" # window title
+		echo Logged out.
+		read
+		;;
+	*)
+		;;
+	esac
+}
+
+function settitle_ps1 {
+	_CTLP=${CTLP}
+	_CTLS=${CTLS}
+	settitle $@
+}
+
+function settitle_dir {
+	_CTLP=""
+	_CTLS=""
+	settitle $@
+}
+
+function settitle {
+	#echo "settitlez: $@"
+	_PWD=$(echo ${PWD}| sed "s;${HOME};~;") # strip home directory
+	if [ -z "$1" ]; then
+		_ARGS=$(ps -p $$ -o args | tail -n +2)
+		_CMD="$(ps -p $$ -o command | tail -n +2)"
+	else
+		_ARGS="$@"
+		_CMD="$@"
+	fi
+	#echo "_ARGS=$_ARGS"
+	#echo "_CMD=$_CMD"
+	# if an interactive session
+	if [[ -t 0 ]]; then
+		if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+			PWD_URL=$(urlencode_spaceonly "file://${HOSTNAME}${PWD}")
+			$ECHO -n "${_CTLP}\033]1;${TERM}\007\033]2;$USER@$HOSTNAME '${_PWD}' ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
+		else
+			case $TERM in
+				*xterm*|*rxvt*|dtterm)
+					PWD_URL=$(urlencode_spaceonly "file://${HOSTNAME}${PWD}")
+					$ECHO -n "${_CTLP}\033]1;${TERM}\007\033]2;${USER}@${SYS}:${_PWD} -c ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
+					;;
+				*screen*)
+					#TODO
+					;;
+			esac
+		fi
+	fi
+}
+
+# Set the prompt
+function setprompt {
+	if [ -n "$KSH" -o -n "$ZSH_VERSION" ]; then
+		_PWD="${PWD/#"$HOME"/\\~}"
+	else
+		_PWD="$($ECHO $PWD| sed "s;$HOME;~;")" # strip home directory
+	fi
+
+	if [[ "$TERM" == "dumb" ]]; then
+		case $UID in
+			0)   # Root prompt
+				PS1="${EXIT} ${HIST} [${LOGNAME}@${HOSTNAME}:${_PWD}] $ "
+				PS2=">  "
+				;;
+			*)   # User prompt
+				PS1="${EXIT} ${HIST} [${LOGNAME}@${HOSTNAME}:${_PWD}] $ "
+				PS2=">  "
+				;;
+		esac
+	else
+		# Read only directories are Red.
+		if [[ ! -w ${PWD} ]] ; then
+			CPWD="${Rc}${_PWD}${Nc}"
+		else
+			CPWD=$_PWD
+		fi
+		case $UID in
+			0)   # Root prompt
+				_PS1="${Rc}[${Nc}${LOGNAME}${Rc}@${Nc}${SYS}${Rc}:${Nc}${Wc}${CPWD}${Nc}${Rc}]${Nc}${Wc}# ${Nc}"
+				_PS2="${Rc}>  ${Nc}"
+				;;
+			*)   # User prompt
+				_PS1="${Yc}${EXIT} ${HIST} ${Bc}[${Nc}${LOGNAME}@${HOSTNAME}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
+				#_PS1="[${SYS}:${CPWD}] "
+				_PS2="${Bc}>  ${Nc}"
+				;;	
+		esac
+		#        _PS1="$x%? h%! ${_PS1}"
+		PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))"
+		# secondary, when command spans multiple lines and needs further input
+		PS2="$($PRINT ${_PS2})"
+	fi
+}

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+OSNAME=`uname`
+
+# source env variables for common
+F=~/.profile_cmn
+[ -f $F ] && source $F
+
+# source env variables for platform
+if [ "$OSNAME" = "Linux" ]; then
+	if [ -f ~/.profile_lnx ]; then
+		source ~/.profile_lnx
+	fi
+elif [ "$OSNAME" = "SunOS" ]; then
+	if [ -f ~/.profile_sol ]; then
+		source ~/.profile_sol
+	fi
+elif [ "$OSNAME" = "Darwin" ]; then
+	if [ -f ~/.profile_macos ]; then
+		source ~/.profile_macos
+	fi
+fi

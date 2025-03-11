@@ -1,0 +1,11 @@
+! keycodes 66 and 69 are the left and right option keys; assign them as Meta keys
+keycode 66 = Meta_L
+keycode 69 = Meta_R
+keycode 63 = Mode_switch
+keycode 71 = Mode_switch
+
+clear mod1
+!clear mod2
+
+add mod1 = Meta_L Meta_R
+!add mod1 = Mode_switch

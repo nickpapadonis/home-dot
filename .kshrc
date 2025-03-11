@@ -1,62 +1,87 @@
-if [[ $- = *i* ]]; then
-    HAVE_TTY=1
-fi
+[ -f ~/.profile-resource ] && . ~/.profile_
 
-if [ -z $KSH_VERSION ]; then
-    KSH_88=1
-fi
-
-if [ -z $KSH_88 ]; then
-    set -o globstar
-fi
-
-ECHO=${ECHO:="echo -ne"}
-export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
-export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
-export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
-export HISTEDIT=${HISTEDIT:-"$EDITOR"}            # History editor ; replaces obsolete var FCEDIT.
-export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
-
-# run logout script on logout
-if [ -z $KSH_88 ]; then
-   trap '. $HOME/.logout; exit' 0
-fi
-
-HIST="\! "
-if [[ -f ~/.rccmn ]]; then
-    . ~/.rccmn
-fi
-
-tput setaf 4 2>/dev/null
-case $? in
-  0) # tput works
-     tput sgr0 
-     Rc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 1\n\" | \
-tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Yc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 3\n\" | \
-tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Bc="${BASH:+\\[}${ZSH_VERSION:+%{}`printf \"setaf 4\n\" | \
-tput -S`${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     # ksh has problems with bold, so no bold
-     Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-  ;;
-  *) # setup the ascii methods.
-     if [[ $TERM != "dumb" ]]; then
-	 Rc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;31m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-	 Yc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;33m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-	 Bc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0;34m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-	 Wc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[1;37m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-	 Nc="${BASH:+\\[}${ZSH_VERSION:+%{}\033[0m${ZSH_VERSION:+%\}}${BASH:+\\]}"
-     fi
-   ;;
+case ${.sh.version} in
+	*"93u+m/1"*)
+		KSH_93UM=1
+		KSH=1
+		;;
+	"93u")
+		KSH_93U=1
+		KSH=1
+		;;
+	*)
+		KSH_88=1
+		KSH=1
+		;;
 esac
 
+if [[ $- = *i* ]]; then
+	HAVE_TTY=1
+fi
+
+set -o globstar
+set -o emacs
+
+ECHO=${ECHO:="echo"}
+#export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
+#export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
+#export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
+export HISTEDIT=${HISTEDIT:-"$EDITOR"}            # History editor ; replaces obsolete var FCEDIT.
+#export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
+
+alias rm='rm -i'
+
+# run logout script on logout
+
+function logout {
+	set -e
+	trap '' EXIT
+	if [ -f $F ]; then
+		. ~/.logout
+	fi
+	terminate
+}
+trap logout EXIT
+
+HDIRPRE='ksh'
+export HISTFILE="${HOME}/.${HDIRPRE}-history"  # Default is ~/.sh_history.
+export HISTFILESIZE=${HISTSIZE:-"1000"}               # maximum number of history events to save (in file).
+
+HIST='\!'
+EXIT='$?'
+
+if [ -f ~/.sh-cmnprompt ]; then
+	. ~/.sh-cmnprompt
+fi
+
 function prompt_cd {
-    ## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
-    command 'cd' "$@" && setprompt && settitle
+	## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
+	command 'cd' $@ && setprompt
 }
 
 alias cd="prompt_cd"
 
-setprompt && settitle
+if [ -n "$KSH_93UM" ]; then
+	function preexec {
+		#		echo "A.sh.value=\"${SV}\""
+		#		echo "A.sh.command=\"${SC}\"" 
+		SC="${.sh.command}"
+		set -e
+		trap '' DEBUG
+		if [[ -t 1 ]]; then
+			#echo "A.sh.level=${.sh.level}"
+			if [ "${SC}" != ".sh.value=" ]; then
+				print -n "$(settitle_dir ${SC})"
+			fi
+		fi
+	}
+fi
+
+cleartitle
+prompt_cd
+
+if [ -n "$KSH_93UM" ]; then
+	if [[ -t 1 ]]; then
+		trap preexec DEBUG
+	fi
+fi
