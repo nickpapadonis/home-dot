@@ -5,15 +5,17 @@
 !xterm.vt100.locale: true
 !xterm*utf8: 1
 
-# Meta characters are converted into a two character sequence
-# with the character itself preceded by ESC.
+! Meta characters are converted into a two character sequence
+! with the character itself preceded by ESC.
 xterm*eightBitInput: false
 
 ! For fixed font
 xterm.*.font: -bitstream-terminal-medium-r-normal--18-*-*-*-*-*-*-1
-!xterm*font: -dec-terminal-medium-r-normal--14-*-*-*-*-*-*-1
-!xterm*font: -dec-terminal-medium-r-normal--16-*-*-*-*-*-*-1
-!xterm*font: -*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-*
+!xterm.*.font: -dec-terminal-medium-r-normal--14-*-*-*-*-*-*-1
+!xterm.*.font: -dec-terminal-medium-r-normal--16-*-*-*-*-*-*-1
+!xterm.*.font: -dec-terminal-medium-r-normal--17-*-*-*-*-*-*-1
+!xterm.*.font: -dec-terminal-bold-r-normal--17-*-*-*-*-*-*-1
+!xterm.*.font: -*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-*
 !xterm.VT100.font: -*-terminus-medium-r-normal-*-16-*-*-*-*-*-iso10646-*
 !xterm*font: -*-terminus-medium-r-normal-*-17-*-*-*-*-*-iso10646-*
 
