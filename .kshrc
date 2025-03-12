@@ -54,6 +54,10 @@ function prompt_cd {
 
 alias cd="prompt_cd"
 
+if [ $KSH_88 ]; then
+	echo "HERE"
+fi
+
 if [ -n "$KSH_93UM" ]; then
 	function preexec {
 		SC="${.sh.command}"
@@ -68,7 +72,7 @@ if [ -n "$KSH_93UM" ]; then
 fi
 
 cleartitle
-prompt_cd
+setprompt_ksh_login
 
 if [ -n "$KSH_93UM" ]; then
 	if [[ -t 1 ]]; then

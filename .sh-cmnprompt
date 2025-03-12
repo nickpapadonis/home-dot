@@ -149,6 +149,13 @@ function settitle {
 	fi
 }
 
+# ksh93um appears to overwrite prior line unless newline is provided at login
+# only for the prompt
+function setprompt_ksh_login {
+	setprompt
+	print -n "\n"
+}
+
 # Set the prompt
 function setprompt {
 	if [ -n "$KSH" -o -n "$ZSH_VERSION" ]; then
@@ -187,7 +194,7 @@ function setprompt {
 				;;	
 		esac
 		#        _PS1="$x%? h%! ${_PS1}"
-		PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))"
+		PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))${_NEWL}"
 		# secondary, when command spans multiple lines and needs further input
 		PS2="$($PRINT ${_PS2})"
 	fi
