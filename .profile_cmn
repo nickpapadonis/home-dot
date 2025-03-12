@@ -35,19 +35,6 @@ if [ -z $UID ] ; then
 	UID=`id | cut -d'(' -f1 | cut -c5-`
 fi
 
-if [ -f "$(which emacs)" ]; then
-	export VISUAL="emacs"
-	export EDITOR="ed"
-elif [ -f "$(which vim)" ]; then
-	export VISUAL="vim"
-	export EDITOR="vim -e"
-elif [ -f "$(which vi)" ]; then
-	export VISUAL="vi"
-	export EDITOR="vi -e"
-elif [ -f "$(which ed)" ]; then
-	export EDITOR="ed"
-fi
-
 #export http_proxy=HTTP_PROXY=
 #export https_proxy=HTTPS_PROXY=
 

@@ -75,6 +75,7 @@ case $TERM in
 esac
 
 setprompt
+printf "\n"
 
 case $TERM in
 	*xterm*|*rxvt*|dtterm)

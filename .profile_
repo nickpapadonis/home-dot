@@ -36,3 +36,16 @@ if (ksh -c 'echo ${.sh.version}') 2>&1 1>/dev/null; then
 elif [ -n $KSH_VERSION ]; then
 	KSH_88=1
 fi
+
+if eval "which emacs >/dev/null"; then
+	export VISUAL="emacs"
+	export EDITOR="emacs"
+elif eval "which vim >/dev/null"; then
+	export VISUAL="vim"
+	export EDITOR="vim -e"
+elif eval "which vi >/dev/null"; then
+	export VISUAL="vi"
+	export EDITOR="vi -e"
+elif eval "which ed >/dev/null"; then
+	export EDITOR="ed"
+fi
