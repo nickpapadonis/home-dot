@@ -124,10 +124,8 @@ function settitle_dir {
 function settitle {
 	if [ -n "$KSH" ]; then
 		_PWD="${PWD/#${HOME}/\~}"
-	elif [ -n "$ZSH_VERSION" ]; then
+	elif [ -n "$ZSH_VERSION" -o -n "$BASH" ]; then
 		_PWD="${PWD/#${HOME}/~}"
-	else
-		_PWD="$($ECHO $PWD| sed "s;$HOME;~;")" # strip home directory
 	fi
 
 	if [ -z "$1" ]; then
@@ -160,10 +158,8 @@ function settitle {
 function setprompt {
 	if [ -n "$KSH" ]; then
 		_PWD="${PWD/#"$HOME"/\~}"
-	elif [ -n "$ZSH_VERSION" ]; then
+	elif [ -n "$ZSH_VERSION" -o "$BASH" ]; then
 		_PWD="${PWD/#"$HOME"/~}"
-	else
-		_PWD="$($ECHO $PWD| sed "s;$HOME;~;")" # strip home directory
 	fi
 
 	if [[ "$TERM" == "dumb" ]]; then

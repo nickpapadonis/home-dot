@@ -56,6 +56,7 @@ alias cd="prompt_cd"
 
 case $TERM in
 	*xterm*|*rxvt*|dtterm)
+		cleartitle
 		if [ -n "$KSH_93UM" ]; then
 			function preexec {
 				SC="${.sh.command}"
@@ -68,7 +69,6 @@ case $TERM in
 				fi
 			}
 		fi
-		cleartitle
 	;;
 	*)
 	;;
