@@ -20,3 +20,19 @@ elif [ "$OSNAME" = "Darwin" ]; then
 		source ~/.profile_macos
 	fi
 fi
+
+if (ksh -c 'echo ${.sh.version}') 2>&1 1>/dev/null; then
+	case $(ksh -c 'echo ${.sh.version}') in
+		*"93u+m/1"*)
+			KSH_93UM=1
+			;;
+		"93u")
+			KSH_93U=1
+			;;
+		*)
+			KSH_88=1
+			;;
+	esac
+elif [ -n $KSH_VERSION ]; then
+	KSH_88=1
+fi

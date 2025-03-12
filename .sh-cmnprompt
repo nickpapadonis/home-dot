@@ -104,17 +104,9 @@ function cleartitle {
 }
 
 function terminate {
-	case $TERM in
-    *xterm*|*rxvt*|dtterm)
-		cleartitle
-		printf "\033]1;terminated\007" # icon name
-		printf "\033]2;terminated\007" # window title
-		echo Logged out.
-		read
-		;;
-	*)
-		;;
-	esac
+	printf "\033]1;X\007" # icon name
+	printf "\033]2;X\007" # window title
+	echo Logged out.
 }
 
 function settitle_ps1 {
@@ -130,7 +122,6 @@ function settitle_dir {
 }
 
 function settitle {
-	#echo "settitlez: $@"
 	_PWD=$(echo ${PWD}| sed "s;${HOME};~;") # strip home directory
 	if [ -z "$1" ]; then
 		_ARGS=$(ps -p $$ -o args | tail -n +2)
@@ -139,8 +130,6 @@ function settitle {
 		_ARGS="$@"
 		_CMD="$@"
 	fi
-	#echo "_ARGS=$_ARGS"
-	#echo "_CMD=$_CMD"
 	# if an interactive session
 	if [[ -t 0 ]]; then
 		if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then

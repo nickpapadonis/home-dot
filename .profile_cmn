@@ -69,11 +69,5 @@ ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
 #alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
 alias ls='ls -F ${LS_COLOUR}'               # list with flags
 
-export GIT="$HOME/vbox-shared/git-local"
-export NRG="$HOME/vbox-shared/git-local/nr-demo-MERN-0"
-
-#export CLOUDSDK_PYTHON=/usr/local/opt/python@3.8/libexec/bin/python3
-#export PATH=/usr/local/opt/python@3.8/libexec/bin:$PATH
-
 F=~/.profile_cmn-local
 [ -f $F ] && source $F

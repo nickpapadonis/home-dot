@@ -22,9 +22,26 @@ export HISTFILESIZE=${HISTSIZE:-"1000"}               # maximum number of histor
 
 [ -f ~/.sh-cmnprompt ] && . ~/.sh-cmnprompt
 
+function logout {
+	set -e
+	trap '' EXIT
+	if [ -f $F ]; then
+		. ~/.logout
+	fi
+	case $TERM in
+    *xterm*|*rxvt*|dtterm)
+		terminate
+		read
+		exit
+		;;
+	*)
+		;;
+	esac
+}
+trap logout EXIT
+
+
 function precmd_title {
-	#echo "A.sh.command=\"${1}\"" 
-	#echo "A.sh2.command=\"${2}\"" 
 	print -n $(settitle_dir "${2}")
 }
 

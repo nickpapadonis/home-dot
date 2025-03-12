@@ -35,6 +35,24 @@ EXIT='$?'
 F=~/.sh-cmnprompt
 [ -f $F ] && . $F
 
+function logout {
+	set -e
+	trap '' EXIT
+	if [ -f $F ]; then
+		. ~/.logout
+	fi
+	case $TERM in
+    *xterm*|*rxvt*|dtterm)
+		terminate
+		read
+		exit
+		;;
+	*)
+		;;
+	esac
+}
+trap logout EXIT
+
 function preexec {
 	#	echo "A.sh.value=\"${1}\""
 	#	echo "A.sh.command=\"${2}\""

@@ -1,19 +1,6 @@
 [ -f ~/.profile-resource ] && . ~/.profile_
 
-case ${.sh.version} in
-	*"93u+m/1"*)
-		KSH_93UM=1
-		KSH=1
-		;;
-	"93u")
-		KSH_93U=1
-		KSH=1
-		;;
-	*)
-		KSH_88=1
-		KSH=1
-		;;
-esac
+KSH=1
 
 if [[ $- = *i* ]]; then
 	HAVE_TTY=1
@@ -31,15 +18,21 @@ export HISTEDIT=${HISTEDIT:-"$EDITOR"}            # History editor ; replaces ob
 
 alias rm='rm -i'
 
-# run logout script on logout
-
 function logout {
 	set -e
 	trap '' EXIT
 	if [ -f $F ]; then
 		. ~/.logout
 	fi
-	terminate
+	case $TERM in
+    *xterm*|*rxvt*|dtterm)
+		terminate
+		read
+		exit
+		;;
+	*)
+		;;
+	esac
 }
 trap logout EXIT
 
@@ -63,13 +56,10 @@ alias cd="prompt_cd"
 
 if [ -n "$KSH_93UM" ]; then
 	function preexec {
-		#		echo "A.sh.value=\"${SV}\""
-		#		echo "A.sh.command=\"${SC}\"" 
 		SC="${.sh.command}"
 		set -e
 		trap '' DEBUG
 		if [[ -t 1 ]]; then
-			#echo "A.sh.level=${.sh.level}"
 			if [ "${SC}" != ".sh.value=" ]; then
 				print -n "$(settitle_dir ${SC})"
 			fi
