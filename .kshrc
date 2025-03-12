@@ -49,33 +49,39 @@ fi
 
 function prompt_cd {
 	## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
-	command 'cd' $@ && setprompt
+	command 'cd' "$@" && setprompt
 }
 
 alias cd="prompt_cd"
 
-if [ $KSH_88 ]; then
-	echo "HERE"
-fi
-
-if [ -n "$KSH_93UM" ]; then
-	function preexec {
-		SC="${.sh.command}"
-		set -e
-		trap '' DEBUG
-		if [[ -t 1 ]]; then
-			if [ "${SC}" != ".sh.value=" ]; then
-				print -n "$(settitle_dir ${SC})"
-			fi
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+		if [ -n "$KSH_93UM" ]; then
+			function preexec {
+				SC="${.sh.command}"
+				set -e
+				trap '' DEBUG
+				if [[ -t 1 ]]; then
+					if [ "${SC}" != ".sh.value=" ]; then
+						print -n "$(settitle_dir ${SC})"
+					fi
+				fi
+			}
 		fi
-	}
-fi
+		cleartitle
+	;;
+	*)
+	;;
+esac
 
-cleartitle
-setprompt_ksh_login
+setprompt
 
-if [ -n "$KSH_93UM" ]; then
-	if [[ -t 1 ]]; then
-		trap preexec DEBUG
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+	if [ -n "$KSH_93UM" ]; then
+		if [[ -t 1 ]]; then
+			trap preexec DEBUG
+		fi
 	fi
-fi
+	;;
+esac

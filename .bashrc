@@ -13,7 +13,7 @@ shopt -s expand_aliases
 
 unset notify
 
-#set bell-style visible
+set bell-style audible
 #set keymap emacs-meta
 
 #shopt -s checkwinsize   # Check window after each command.
@@ -63,10 +63,14 @@ function preexec {
 	fi
 }
 
-cleartitle
 setprompt
-if [[ -t 1 ]]; then
-	trap preexec DEBUG
-fi
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+		cleartitle
+		if [[ -t 1 ]]; then
+			trap preexec DEBUG
+		fi
+		;;
+esac
 
 PROMPT_COMMAND=setprompt

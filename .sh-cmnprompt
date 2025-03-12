@@ -122,7 +122,14 @@ function settitle_dir {
 }
 
 function settitle {
-	_PWD=$(echo ${PWD}| sed "s;${HOME};~;") # strip home directory
+	if [ -n "$KSH" ]; then
+		_PWD="${PWD/#${HOME}/\~}"
+	elif [ -n "$ZSH_VERSION" ]; then
+		_PWD="${PWD/#${HOME}/~}"
+	else
+		_PWD="$($ECHO $PWD| sed "s;$HOME;~;")" # strip home directory
+	fi
+
 	if [ -z "$1" ]; then
 		_ARGS=$(ps -p $$ -o args | tail -n +2)
 		_CMD="$(ps -p $$ -o command | tail -n +2)"
@@ -149,17 +156,12 @@ function settitle {
 	fi
 }
 
-# ksh93um appears to overwrite prior line unless newline is provided at login
-# only for the prompt
-function setprompt_ksh_login {
-	setprompt
-	print -n "\n"
-}
-
 # Set the prompt
 function setprompt {
-	if [ -n "$KSH" -o -n "$ZSH_VERSION" ]; then
-		_PWD="${PWD/#"$HOME"/\\~}"
+	if [ -n "$KSH" ]; then
+		_PWD="${PWD/#"$HOME"/\~}"
+	elif [ -n "$ZSH_VERSION" ]; then
+		_PWD="${PWD/#"$HOME"/~}"
 	else
 		_PWD="$($ECHO $PWD| sed "s;$HOME;~;")" # strip home directory
 	fi
@@ -189,13 +191,18 @@ function setprompt {
 				;;
 			*)   # User prompt
 				_PS1="${Yc}${EXIT} ${HIST} ${Bc}[${Nc}${LOGNAME}@${HOSTNAME}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
-				#_PS1="[${SYS}:${CPWD}] "
 				_PS2="${Bc}>  ${Nc}"
-				;;	
+				case $TERM in
+				*xterm*|*rxvt*|dtterm)
+					PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))"
+					PS2="$($PRINT ${_PS2})"
+					;;
+					*)
+					PS1="$($PRINT ${_PS1})"
+					PS2="$($PRINT ${_PS2})"
+					;;
+					esac
+				;;
 		esac
-		#        _PS1="$x%? h%! ${_PS1}"
-		PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))${_NEWL}"
-		# secondary, when command spans multiple lines and needs further input
-		PS2="$($PRINT ${_PS2})"
 	fi
 }

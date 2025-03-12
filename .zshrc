@@ -40,11 +40,15 @@ function logout {
 }
 trap logout EXIT
 
-
 function precmd_title {
 	print -n $(settitle_dir "${2}")
 }
 
-cleartitle
-preexec() { precmd_title $@ }
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+		cleartitle
+		preexec() { precmd_title $@ }
+		;;
+esac
+
 precmd() { setprompt }
