@@ -7,19 +7,20 @@ F=~/.profile_cmn
 [ -f $F ] && source $F
 
 # source env variables for platform
-if [ "$OSNAME" = "Linux" ]; then
-	if [ -f ~/.profile_lnx ]; then
-		source ~/.profile_lnx
-	fi
-elif [ "$OSNAME" = "SunOS" ]; then
-	if [ -f ~/.profile_sol ]; then
-		source ~/.profile_sol
-	fi
-elif [ "$OSNAME" = "Darwin" ]; then
-	if [ -f ~/.profile_macos ]; then
-		source ~/.profile_macos
-	fi
-fi
+case $OSNAME in
+	Linux)
+		F=~/.profile_lnx
+		[ -f $F ] && source $F
+		;;
+	SunOS)
+		F=~/.profile_sol
+		[ -f $F ] && source $F
+		;;
+	Darwin)
+		F=~/.profile_macos
+		[ -f $F ] && source $F
+		;;
+esac
 
 if (ksh -c 'echo ${.sh.version}') 2>&1 1>/dev/null; then
 	case $(ksh -c 'echo ${.sh.version}') in

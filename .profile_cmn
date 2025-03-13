@@ -35,25 +35,16 @@ if [ -z $UID ] ; then
 	UID=`id | cut -d'(' -f1 | cut -c5-`
 fi
 
-#export http_proxy=HTTP_PROXY=
-#export https_proxy=HTTPS_PROXY=
-
 ## GNU grep, if available, has colorized output.
 grep --version 2> /dev/null | grep GNU >/dev/null 2>&1 && GREP='grep --color=auto'
 export SYS=`echo $HOSTNAME | sed 's|\..*||'`
-export PATH=$HOME/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
-
 
 # check for human readable ( -h )
 ls -h /dev/null 2> /dev/null 1>&2 && H='-h'
 
 # check for GNU ls (colorful list)
-
 #ls --version 2> /dev/null | grep GNU >/dev/null 2>&1 && export LS_COLOUR="--color=auto"
 
-#alias l.='ls -lAdF ${H} ${LS_COLOUR} .*'    # list only hidden things
-#alias la='ls -lAF ${H} ${LS_COLOUR}'        # list all
-#alias ll='ls -lF ${H} ${LS_COLOUR}'         # list long
 alias ls='ls -F ${LS_COLOUR}'               # list with flags
 
 F=~/.profile_cmn-local

@@ -10,8 +10,6 @@ set -o globstar
 set -o emacs
 
 ECHO=${ECHO:="echo"}
-#export EXTENDED_HISTORY=ON                        # AIX-5.3 ksh datestamp in ksh history.
-#export HISTFILE="$HOME/.ksh_history" # Default is ~/.sh_history.
 #export HISTSIZE=${HISTSIZE:-"2000"}               # Lines of command history logged.
 export HISTEDIT=${HISTEDIT:-"$EDITOR"}            # History editor ; replaces obsolete var FCEDIT.
 #export HISTIGNORE=${HISTIGNORE:-"ls:ll:la:l.:bg:fg:history"}        # Explicitly ignore file listing.
@@ -24,20 +22,22 @@ function logout {
 	if [ -f $F ]; then
 		. ~/.logout
 	fi
-	case $TERM in
-    *xterm*|*rxvt*|dtterm)
-		terminate
-		read
-		exit
-		;;
-	*)
-		;;
-	esac
+	if [ ${SHLVL} -eq 1 ]; then
+		case $TERM in
+		*xterm*|*rxvt*|dtterm)
+			#terminate
+			echo "Exit."
+			read
+			exit
+			;;
+		*)
+			;;
+		esac
+	fi
 }
 trap logout EXIT
 
-HDIRPRE='ksh'
-export HISTFILE="${HOME}/.${HDIRPRE}-history"  # Default is ~/.sh_history.
+export HISTFILE="${HOME}/.ksh-history"  # Default is ~/.sh_history.
 export HISTFILESIZE=${HISTSIZE:-"1000"}               # maximum number of history events to save (in file).
 
 HIST='\!'
@@ -48,41 +48,41 @@ if [ -f ~/.sh-cmnprompt ]; then
 fi
 
 function prompt_cd {
-	## The command builtin does not exist in some ksh88, notable hp-ux 11i, but does in Solaris 10.
 	command 'cd' "$@" && setprompt
 }
 
 alias cd="prompt_cd"
 
-case $TERM in
-	*xterm*|*rxvt*|dtterm)
-		cleartitle
-		if [ -n "$KSH_93UM" ]; then
-			function preexec {
-				SC="${.sh.command}"
-				set -e
-				trap '' DEBUG
-				if [[ -t 1 ]]; then
-					if [ "${SC}" != ".sh.value=" ]; then
+setprompt
+
+# There appears a bug on ksh application side
+# in setting XTerm title bar with ksh leaving out
+# for now.
+if false; then
+	case $TERM in
+		*xterm*|*rxvt*|dtterm)
+			if [ -n "$KSH_93UM" ]; then
+				function preexec {
+					SC="${.sh.command}"
+					set -e
+					trap '' DEBUG
+					if [[ -t 1 ]]; then
 						print -n "$(settitle_dir ${SC})"
 					fi
-				fi
-			}
-		fi
-	;;
-	*)
-	;;
-esac
+				}
+			fi
+		;;
+		*)
+		;;
+	esac
 
-setprompt
-printf "\n"
-
-case $TERM in
-	*xterm*|*rxvt*|dtterm)
-	if [ -n "$KSH_93UM" ]; then
-		if [[ -t 1 ]]; then
-			trap preexec DEBUG
+	case $TERM in
+		*xterm*|*rxvt*|dtterm)
+		if [ -n "$KSH_93UM" ]; then
+			if [[ -t 1 ]]; then
+				trap preexec DEBUG
+			fi
 		fi
-	fi
-	;;
-esac
+		;;
+	esac
+fi

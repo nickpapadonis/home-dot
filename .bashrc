@@ -41,21 +41,22 @@ function logout {
 	if [ -f $F ]; then
 		. ~/.logout
 	fi
-	case $TERM in
-    *xterm*|*rxvt*|dtterm)
-		terminate
-		read
-		exit
-		;;
-	*)
-		;;
-	esac
+	if [ ${SHLVL} -eq 1 ]; then
+		case $TERM in
+		*xterm*|*rxvt*|dtterm)
+			terminate
+			echo "Exit."
+			read
+			exit
+			;;
+		*)
+			;;
+		esac
+	fi
 }
 trap logout EXIT
 
 function preexec {
-	#	echo "A.sh.value=\"${1}\""
-	#	echo "A.sh.command=\"${2}\""
 	set -e
 	trap '' DEBUG
 	if [[ -t 1 ]]; then
@@ -66,7 +67,6 @@ function preexec {
 setprompt
 case $TERM in
 	*xterm*|*rxvt*|dtterm)
-		cleartitle
 		if [[ -t 1 ]]; then
 			trap preexec DEBUG
 		fi

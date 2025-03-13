@@ -13,11 +13,10 @@ precmd_functions=""
 ECHO=${ECHO:="echo"}
 HIST='%!'
 EXIT='%?'
-HDIRPRE="zsh"
 
 alias rm='rm -i'
 
-export HISTFILE="${HOME}/.${HDIRPRE}-history"  # Default is ~/.sh_history.
+export HISTFILE="${HOME}/.zsh-history"  # Default is ~/.sh_history.
 export HISTFILESIZE=${HISTSIZE:-"1000"}               # maximum number of history events to save (in file).
 
 [ -f ~/.sh-cmnprompt ] && . ~/.sh-cmnprompt
@@ -28,27 +27,34 @@ function logout {
 	if [ -f $F ]; then
 		. ~/.logout
 	fi
-	case $TERM in
-    *xterm*|*rxvt*|dtterm)
-		terminate
-		read
-		exit
-		;;
-	*)
-		;;
-	esac
+	if [[ "$TERM_PROGRAM" != "Apple_Terminal" ]]; then
+		if [ ${SHLVL} -eq 1 ]; then
+			case $TERM in
+			*xterm*|*rxvt*|dtterm)
+				terminate
+				echo "Exit."
+				read
+				exit
+				;;
+			*)
+				;;
+			esac
+		fi
+	fi
 }
 trap logout EXIT
 
 function precmd_title {
-	print -n $(settitle_dir "${2}")
+	print -n $(settitle_dir "${1}")
 }
 
 case $TERM in
 	*xterm*|*rxvt*|dtterm)
 		cleartitle
-		preexec() { precmd_title $@ }
+		preexec() { precmd_title $1 }
 		;;
 esac
 
 precmd() { setprompt }
+
+cleartitle

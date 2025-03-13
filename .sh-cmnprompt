@@ -30,7 +30,7 @@ if [[ -n ${KSH} ]]; then
 elif [[ -n ${ZSH_VERSION} ]]; then
 	PRINT="print"
 else
-	PRINT="ECHO -n"
+	PRINT="$ECHO"
 fi
 
 # Title Bar path will be truncated to this max length
@@ -106,7 +106,6 @@ function cleartitle {
 function terminate {
 	printf "\033]1;X\007" # icon name
 	printf "\033]2;X\007" # window title
-	echo Logged out.
 }
 
 function settitle_ps1 {
@@ -188,6 +187,8 @@ function setprompt {
 			*)   # User prompt
 				_PS1="${Yc}${EXIT} ${HIST} ${Bc}[${Nc}${LOGNAME}@${HOSTNAME}${Bc}:${Nc}${Wc}${CPWD}${Nc}${Bc}]${Nc}${Wc}${Nc}$ ${Nc}"
 				_PS2="${Bc}>  ${Nc}"
+				PS1="$($PRINT ${_PS1})"
+				PS2="$($PRINT ${_PS2})"
 				case $TERM in
 				*xterm*|*rxvt*|dtterm)
 					PS1="$($PRINT ${_PS1})$($PRINT $(settitle_ps1))"
