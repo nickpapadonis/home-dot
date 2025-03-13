@@ -19,9 +19,10 @@ alias rm='rm -i'
 function logout {
 	set -e
 	trap '' EXIT
-	if [ -f $F ]; then
-		. ~/.logout
-	fi
+
+	F="~/.logout"
+	[ -f $F ] && source $F
+
 	if [ ${SHLVL} -eq 1 ]; then
 		case $TERM in
 		*xterm*|*rxvt*|dtterm)

@@ -24,9 +24,9 @@ export HISTFILESIZE=${HISTSIZE:-"1000"}               # maximum number of histor
 function logout {
 	set -e
 	trap '' EXIT
-	if [ -f $F ]; then
-		. ~/.logout
-	fi
+	F="~/.logout"
+	echo HERE2
+	[ -f $F ] && echo HERE && source $F
 	if [[ "$TERM_PROGRAM" != "Apple_Terminal" ]]; then
 		if [ ${SHLVL} -eq 1 ]; then
 			case $TERM in
