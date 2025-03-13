@@ -8,16 +8,21 @@
 ! Meta characters are converted into a two character sequence
 ! with the character itself preceded by ESC.
 xterm*eightBitInput: false
+!xterm*cursorBlink: true
+xterm*buffered: true
+xterm*bufferedFPS: 100
+!xterm*ptyInitialErase: true
+!xterm*utf8Title: always
 
 ! For fixed font
+! Normal
 xterm.*.font: -bitstream-terminal-medium-r-normal--18-*-*-*-*-*-*-1
-!xterm.*.font: -dec-terminal-medium-r-normal--14-*-*-*-*-*-*-1
-!xterm.*.font: -dec-terminal-medium-r-normal--16-*-*-*-*-*-*-1
-!xterm.*.font: -dec-terminal-medium-r-normal--17-*-*-*-*-*-*-1
-!xterm.*.font: -dec-terminal-bold-r-normal--17-*-*-*-*-*-*-1
-!xterm.*.font: -*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-*
-!xterm.VT100.font: -*-terminus-medium-r-normal-*-16-*-*-*-*-*-iso10646-*
-!xterm*font: -*-terminus-medium-r-normal-*-17-*-*-*-*-*-iso10646-*
+xterm.*.font3: -dec-terminal-*-*-*-17-*-*-*-*-*-*-*
+xterm.*.font4: -bitstream-terminal-*-*-*-17-*-*-*-*-*-*-*
+xterm.*.font5: -xos4-terminus-*-*-*-22-*-*-*-*-*-*-*
+xterm.*.font6: -xos4-terminus-*-*-*-24-*-*-*-*-*-*-*
+xterm.*.font7: -xos4-terminus-*-*-*-28-*-*-*-*-*-*-*
+! font1=unreadable, 2=tiny, 3=small, 4=medium, 5=large, 6=huge, 7=enormous
 
 ! For ttf fonts, defining will override fixed font
 !XTerm*renderFont: true
