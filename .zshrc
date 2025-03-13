@@ -25,8 +25,7 @@ function logout {
 	set -e
 	trap '' EXIT
 	F="~/.logout"
-	echo HERE2
-	[ -f $F ] && echo HERE && source $F
+	[ -f $F ] && source $F
 	if [[ "$TERM_PROGRAM" != "Apple_Terminal" ]]; then
 		if [ ${SHLVL} -eq 1 ]; then
 			case $TERM in
@@ -56,5 +55,3 @@ case $TERM in
 esac
 
 precmd() { setprompt }
-
-cleartitle
