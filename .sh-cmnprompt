@@ -138,12 +138,12 @@ function settitle {
 	if [[ -t 0 ]]; then
 		if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
 			PWD_URL=$(urlencode_spaceonly "file://${HOSTNAME}${PWD}")
-			$ECHO -n "${_CTLP}\033]1;${TERM}\007\033]2;$USER@$HOSTNAME '${_PWD}' ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
+			$ECHO -n "${_CTLP}\033]1;${_ARGS}\007\033]2;$USER@$HOSTNAME '${_PWD}' ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
 		else
 			case $TERM in
 				*xterm*|*rxvt*|dtterm)
 					PWD_URL=$(urlencode_spaceonly "file://${HOSTNAME}${PWD}")
-					$ECHO -n "${_CTLP}\033]1;${TERM}\007\033]2;${USER}@${SYS}:${_PWD} -c ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
+					$ECHO -n "${_CTLP}\033]1;${_ARGS}\007\033]2;${USER}@${SYS}:${_PWD} -c ${_ARGS}\007\033]7;${PWD_URL}\007${_CTLS}"
 					;;
 				*screen*)
 					#TODO
