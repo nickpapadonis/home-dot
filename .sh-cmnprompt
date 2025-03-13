@@ -1,7 +1,7 @@
 CTLP="${BASH:+\\[}${ZSH_VERSION:+%{}"
 CTLS="${BASH:+\\]}${ZSH_VERSION:+%\}}"
 
-(exec tput colors) 2>&1 1>/dev/null
+(exec tput sgr0) 2>&1 1>/dev/null
 case $? in
   0) # tput works
      Rc="${CTLP}`printf \"setaf 1\n\" | tput -S`${CTLS}"
