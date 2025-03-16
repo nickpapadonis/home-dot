@@ -1,5 +1,17 @@
 [ -f ~/.profile-resource ] && . ~/.profile_
 
+	case ${.sh.version} in
+		*"93u+m/1.1"*)
+			KSH_93UM=1
+			;;
+		"93u")
+			KSH_93U=1
+			;;
+		*)
+			KSH_88=1
+			;;
+	esac
+
 KSH=1
 
 if [[ $- = *i* ]]; then
@@ -56,34 +68,33 @@ alias cd="prompt_cd"
 
 setprompt
 
-# There appears a bug on ksh application side
-# in setting XTerm title bar with ksh leaving out
-# for now.
-if false; then
-	case $TERM in
-		*xterm*|*rxvt*|dtterm)
-			if [ -n "$KSH_93UM" ]; then
-				function preexec {
-					SC="${.sh.command}"
-					set -e
-					trap '' DEBUG
-					if [[ -t 1 ]]; then
-						print -n "$(settitle_dir ${SC})"
-					fi
-				}
-			fi
-		;;
-		*)
-		;;
-	esac
-
-	case $TERM in
-		*xterm*|*rxvt*|dtterm)
-		if [ -n "$KSH_93UM" ]; then
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+	if [ -n "$KSH_93UM" ]; then
+	    function preexec {
+			SC="${.sh.command}"
+			trap '' DEBUG
 			if [[ -t 1 ]]; then
-				trap preexec DEBUG
+				if [ "${SC}" = ".sh.value=" ]; then
+					_CMD="$(ps -p $$ -o command | tail -n +2)"
+					settitle_dir ${_CMD}
+				else
+					settitle_dir ${SC}
+				fi
 			fi
-		fi
-		;;
-	esac
-fi
+	    }
+	fi
+	;;
+    *)
+	;;
+esac
+
+case $TERM in
+	*xterm*|*rxvt*|dtterm)
+	if [ -n "$KSH_93UM" ]; then
+	    if [[ -t 1 ]]; then
+		trap preexec DEBUG
+	    fi
+	fi
+	;;
+esac

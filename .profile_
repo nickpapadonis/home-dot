@@ -22,22 +22,6 @@ case $OSNAME in
 		;;
 esac
 
-if (ksh -c 'echo ${.sh.version}') 2>&1 1>/dev/null; then
-	case $(ksh -c 'echo ${.sh.version}') in
-		*"93u+m/1"*)
-			KSH_93UM=1
-			;;
-		"93u")
-			KSH_93U=1
-			;;
-		*)
-			KSH_88=1
-			;;
-	esac
-elif [ -n $KSH_VERSION ]; then
-	KSH_88=1
-fi
-
 if eval "which emacs >/dev/null"; then
 	export VISUAL="emacs"
 	export EDITOR="emacs"

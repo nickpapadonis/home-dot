@@ -44,12 +44,11 @@ function logout {
 trap logout EXIT
 
 function precmd_title {
-	print -n $(settitle_dir "${1}")
+	settitle_dir "${1}"
 }
 
 case $TERM in
 	*xterm*|*rxvt*|dtterm)
-		cleartitle
 		preexec() { precmd_title $1 }
 		;;
 esac

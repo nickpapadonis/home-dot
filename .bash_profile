@@ -1,3 +1,5 @@
-if [ $OSNAME = "Darwin" ]; then
+source ~/.profile
+
+if [ "$OSNAME" = "Darwin" ]; then
 	bind -x '"\C-l": clear'
 fi

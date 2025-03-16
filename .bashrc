@@ -61,7 +61,7 @@ function preexec {
 	set -e
 	trap '' DEBUG
 	if [[ -t 1 ]]; then
-		printf "$(settitle_dir ${BASH_COMMAND})" > /dev/tty
+		settitle_bash_dir "${BASH_COMMAND}"
 	fi
 }
 
