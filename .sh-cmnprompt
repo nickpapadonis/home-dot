@@ -82,15 +82,23 @@ function pwd_homedir {
 
 function title_ps1 {
 	if [ -n "$ZSH_VERSION" ]; then
-		title_zshksh_ps1
+		title_zsh_ps1
 	elif [ -n "$KSH" ]; then
-		title_zshksh_ps1
+		title_ksh_ps1
 	elif [ -n "$BASH" ]; then
 		title_bash_ps1
 	fi
 }
 
-function title_zshksh_ps1 {
+function title_ksh_ps1 {
+	_PWD=$(pwd_homedir)
+	_CMD="$(ps -p $$ -o command | tail -n +2)"
+	print -n "${CTLP}\033]1;$_CMD\007${CTLS}"
+	print -n "${CTLP}\033]2;$USER@$HOSTNAME \'${_PWD}\' \'${_CMD}\'\007${CTLS}"
+	print -n "${CTLP}\033]7;${PWD}\007${CTLS}"
+}
+
+function title_zsh_ps1 {
 	_PWD=$(pwd_homedir)
 	PWD_URL=$(urlencode_spaceonly_zshksh "file://${HOSTNAME}${PWD}")
 	_CMD="$(ps -p $$ -o command | tail -n +2)"
