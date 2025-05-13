@@ -1,5 +1,8 @@
 ! xrdb -query | grep var
 
+!Xft.dpi: 120
+!Xft.hinting: false
+
 ! enable locale and utf-8 encoding is default
 !xterm*locale: true
 !xterm.vt100.locale: true
@@ -31,7 +34,7 @@ xterm.*.font7: -xos4-terminus-*-*-*-28-*-*-*-*-*-*-*
 !XTerm*boldFont: SF Mono
 !XTerm*boldMode: true
 !XTerm*faceSize: 14
-!XTerm*scaleHeight: .9
+!XTerm*scaleHeight: 1.9
 
 !xterm*faceSize1: 8
 !xterm*faceSize2: 10
@@ -96,3 +99,6 @@ URxvt*color14: #00FFFF // cyan
 URxvt*color15: #FFFFFF // white
 
 !*VT100.translations: #override  Meta <KeyPress> V:  insert-selection(PRIMARY, CUT_BUFFER0) \n
+
+Mwm*keyboardFocusPolicy: pointer
+!Mwm*focusAutoRaise:true 4
