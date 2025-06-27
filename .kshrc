@@ -16,6 +16,7 @@ KSH=1
 
 if [[ $- = *i* ]]; then
 	HAVE_TTY=1
+	. ~/.profile
 fi
 
 set -o globstar
